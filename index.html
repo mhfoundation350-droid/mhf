@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meghna Humanity Foundation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Hind Siliguri',sans-serif}</style>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-green-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 id="site-name" class="text-3xl font-bold">Meghna Humanity Foundation</h1>
+                    <p id="site-slogan" class="text-green-100 mt-1">মানবতার সেবায় আমরা অঙ্গীকারবদ্ধ</p>
+                </div>
+                <a href="admin.html" class="bg-white text-green-600 px-4 py-2 rounded-lg font-semibold">Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="bg-white py-8">
+        <div class="container mx-auto px-4 grid grid-cols-3 gap-4 text-center">
+            <div><h3 id="total-donation" class="text-3xl font-bold text-green-600">০</h3><p>মোট অনুদান</p></div>
+            <div><h3 id="total-cost" class="text-3xl font-bold text-red-600">০</h3><p>মোট খরচ</p></div>
+            <div><h3 id="current-balance" class="text-3xl font-bold text-blue-600">০</h3><p>বর্তমান ব্যালেন্স</p></div>
+        </div>
+    </section>
+
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">আমাদের কমিটি</h2>
+            <div id="committee-list" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </div>
+    </section>
+
+    <section class="bg-white py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-6">আমাদের সম্পর্কে</h2>
+            <p id="about-text" class="text-gray-700 text-lg leading-relaxed text-center max-w-3xl mx-auto"></p>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-xl font-bold mb-4">যোগাযোগ</h3>
+            <p id="contact-info"></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
