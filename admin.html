@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MHF Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<div id="login" class="min-h-screen flex items-center justify-center">
+<div class="bg-white p-8 rounded-lg shadow-md w-96">
+<h1 class="text-2xl font-bold text-center text-green-700 mb-6">MHF Admin Login</h1>
+<input type="password" id="pass" placeholder="Password দিন" class="w-full p-3 border rounded mb-4">
+<button onclick="login()" class="w-full bg-green-600 text-white p-3 rounded font-bold">Login করুন</button>
+<p class="text-center text-sm mt-4 text-gray-500">Default Password: mhf2024</p>
+</div>
+
+<script>
+function login(){
+  if(document.getElementById('pass').value === 'mhf2024'){
+    alert('Login সফল! এখন সদস্য যোগ করুন।');
+    window.location.href = 'index.html'; 
+  } else {
+    alert('Password ভুল!');
+  }
+}
+</script>
+</body>
+</html>
