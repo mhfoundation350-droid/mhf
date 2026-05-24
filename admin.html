@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MHF Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+<div id="login" class="max-w-sm mx-auto bg-white p-6 rounded-lg shadow-md mt-20">
+<h1 class="text-2xl font-bold text-center text-green-700 mb-4">MHF Admin</h1>
+<input type="password" id="pass" placeholder="Password" class="w-full p-3 border rounded mb-3">
+<button onclick="login()" class="w-full bg-green-600 text-white p-3 rounded font-bold">Login</button>
+<p class="text-center text-sm mt-3 text-gray-500">Password: mhf2024</p>
+</div>
+
+<div id="panel" class="hidden max-w-2xl mx-auto">
+<div class="bg-white p-6 rounded-lg shadow-md mt-10">
+<h1 class="text-2xl font-bold text-green-700 mb-4">সদস্য যোগ করুন</h1>
+<input type="text" id="name" placeholder="নাম" class="w-full p-3 border rounded mb-3">
+<input type="text" id="role" placeholder="পদবি" class="w-full p-3 border rounded mb-3">
+<input type="file" id="image" accept="image/*" class="w-full p-3 border rounded mb-3">
+<button onclick="addMember()" class="w-full bg-green-600 text-white p-3 rounded font-bold">যোগ করুন</button>
+<p id="msg" class="text-center mt-4 font-bold"></p>
+<div class="mt-4 text-center">
+<a href="index.html" class="text-blue-600">মেইন সাইট দেখুন</a>
+</div>
+
+<script>
+const REPO = 'mhfoundation350-droid/mhf';
+let TOKEN = localStorage.getItem('gh_token');
+
+function login(){
+  if(document.getElementById('pass').value === 'mhf2024'){
+    if(!TOKEN) TOKEN = prompt('GitHub Token দিন:');
+    if(TOKEN){
+      localStorage.setItem('gh_token', TOKEN);
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('panel').classList.remove('hidden');
+    }
+  } else { alert('Password ভুল!'); }
+}
+
+async function addMember(){
+  const name = document.getElementById('name').value;
+  const role = document.getElementById('role').value;
+  const imgFile = document.getElementById('image').files[0];
+  const msg = document.getElementById('msg');
+  
+  if(!name ||!role ||!imgFile){ msg.innerHTML = '<span class="text-red-600">সব ঘর পূরণ করুন</span>'; return; }
+  msg.innerHTML = '<span class="text-blue-600">আপলোড হচ্ছে...</span>';
+  
+  try {
+    const imgBase64 = await toBase64(imgFile);
+    const imgName = `images/${Date.now()}.jpg`;
+    await githubAPI(`contents/${imgName}`, 'PUT', { message: 'Add member image', content: imgBase64 });
+    
+    const res = await githubAPI('contents/members.json', 'GET');
+    const members = JSON.parse(atob(res.content));
+    members.push({ name, role, image: imgName });
+    
+    await githubAPI('contents/members.json', 'PUT', {
+      message: 'Add new member',
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(members, null, 2)))),
+      sha: res.sha
+    });
+    
+    msg.innerHTML = '<span class="text-green-600">সফল! 1-2 মিনিট পর সাইটে দেখুন ✅</span>';
+    document.getElementById('name').value = '';
+    document.getElementById('role').value = '';
+    document.getElementById('image').value = '';
+  } catch(e){
+    msg.innerHTML = '<span class="text-red-600">Error: ' + e.message + '</span>';
+  }
+}
+
+function toBase64(file){ return new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result.split(',')[1]); fr.readAsDataURL(file); }); }
+
+async function githubAPI(path, method, body){
+  const res = await fetch(`https://api.github.com/repos/${REPO}/${path}`, {
+    method, headers: { 'Authorization': `token ${TOKEN}`, 'Content-Type': 'application/json' },
+    body: body? JSON.stringify(body) : null
+  });
+  if(!res.ok) throw new Error((await res.json()).message);
+  return res.json();
+}
+if(TOKEN){ login(); document.getElementById('pass').value='mhf2024'; }
+</script>
+</body>
+</html>
