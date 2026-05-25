@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>নিউজ ও ইভেন্ট - মেঘনা হিউম্যানিটি ফাউন্ডেশন</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body { font-family: 'SolaimanLipi', sans-serif; }</style>
+</head>
+<body class="bg-gray-50">
+  <header class="bg-blue-700 text-white p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 id="siteName" class="text-2xl font-bold">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+      <nav class="space-x-4">
+        <a href="index.html">হোম</a>
+        <a href="news.html" class="font-bold">নিউজ</a>
+        <a href="team.html">টিম</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-center mb-8">সর্বশেষ নিউজ ও ইভেন্ট</h2>
+      <div id="newsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-white py-8 mt-12">
+    <div class="container mx-auto px-4 text-center">
+      <p class="text-lg font-bold" id="footerName">মেঘনা হিউম্যানিটি ফাউন্ডেশন</p>
+    </div>
+  </footer>
+
+<script>
+const BASE_URL = 'https://raw.githubusercontent.com/mhfoundation350-droid/mhf/main/data/';
+async function loadNews() {
+  const settings = await fetch(BASE_URL + 'settings.json').then(r => r.json());
+  document.getElementById('siteName').textContent = settings.name;
+  document.getElementById('footerName').textContent = settings.name;
+  
+  const news = await fetch(BASE_URL + 'news.json').then(r => r.json());
+  if(news.length === 0){
+    document.getElementById('newsList').innerHTML = '<p class="text-center col-span-3 text-gray-500">কোন নিউ
