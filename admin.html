@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - মেঘনা হিউম্যানিটি ফাউন্ডেশন</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap');
+        body { font-family: 'Noto Sans Bengali', sans-serif; }
+        .tab-active { background: #16a34a; color: white; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="container mx-auto p-4 max-w-6xl">
+    <h1 class="text-3xl font-bold text-center mb-8 text-green-700">মেঘনা হিউম্যানিটি ফাউন্ডেশন - Firebase Admin Panel</h1>
+    
+    <!-- Tabs -->
+    <div class="flex flex-wrap gap-2 mb-6 justify-center">
+        <button onclick="showTab('settings')" class="tab-btn px-6 py-2 rounded-lg bg-white shadow tab-active">সেটিংস</button>
+        <button onclick="showTab('committee')" class="tab-btn px-6 py-2 rounded-lg bg-white shadow">কমিটি</button>
+        <button onclick="showTab('gallery')" class="tab-btn px-6 py-2 rounded-lg bg-white shadow">গ্যালারি</button>
+        <button onclick="showTab('youtube')" class="tab-btn px-6 py-2 rounded-lg bg-white shadow">YouTube</button>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="settings" class="tab-content bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-4">সাইট সেটিংস</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+            <input type="text" id="phone1" placeholder="ফোন নম্বর ১" class="p-3 border rounded">
+            <input type="text" id="phone2" placeholder="ফোন নম্বর ২" class="p-3 border rounded">
+            <input type="text" id="fb" placeholder="Facebook লিংক" class="p-3 border rounded">
+            <input type="text" id="yt" placeholder="YouTube লিংক" class="p-3 border rounded">
+            <input type="text" id="address" placeholder="ঠিকানা" class="p-3 border rounded md:col-span-2">
+        </div>
+        <button onclick="saveSettings()" class="mt-4 bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700">সেভ করুন</button>
+    </div>
+
+    <!-- Committee Tab -->
+    <div id="committee" class="tab-content bg-white p-6 rounded-lg shadow-lg hidden">
+        <h2 class="text-2xl font-bold mb-4">কমিটি সদস্য যোগ করুন</h2>
+        <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <input type="text" id="c_name" placeholder="নাম" class="p-3 border rounded">
+            <input type="text" id="c_post" placeholder="পদবী" class="p-3 border rounded">
+            <input type="text" id="c_img" placeholder="ছবির লিংক" class="p-3 border rounded">
+            <input type="text" id="c_phone" placeholder="ফোন নম্বর" class="p-3 border rounded">
+        </div>
+        <button onclick="addCommittee()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700">যোগ করুন</button>
+        <div id="committee_list" class="mt-6 grid md:grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- Gallery Tab -->
+    <div id="gallery" class="tab-content bg-white p-6 rounded-lg shadow-lg hidden">
+        <h2 class="text-2xl font-bold mb-4">গ্যালারিতে ছবি যোগ করুন</h2>
+        <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <input type="text" id="g_title" placeholder="ছবির টাইটেল" class="p-3 border rounded">
+            <input type="text" id="g_img" placeholder="ছবির লিংক" class="p-3 border rounded">
+        </div>
+        <button onclick="addGallery()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700">যোগ করুন</button>
+        <div id="gallery_list" class="mt-6 grid md:grid-cols-4 gap-4"></div>
+    </div>
+
+    <!-- YouTube Tab -->
+    <div id="youtube" class="tab-content bg-white p-6 rounded-lg shadow-lg hidden">
+        <h2 class="text-2xl font-bold mb-4">YouTube ভিডিও যোগ করুন</h2>
+        <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <input type="text" id="y_title" placeholder="ভিডিও টাইটেল" class="p-3 border rounded">
+            <input type="text" id="y_link" placeholder="Embed লিংক" class="p-3 border rounded">
+        </div>
+        <p class="text-sm text-gray-600 mb-4">Note: YouTube লিংক https://www.youtube.com/embed/VIDEO_ID ফরম্যাটে দিবেন</p>
+        <button onclick="addYoutube()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700">যোগ করুন</button>
+        <div id="youtube_list" class="mt-6 grid md:grid-cols-2 gap-4"></div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBxM3ARqJFrR-joDhEFCLR91UJPkovun-U",
+  authDomain: "mhf-foundation.firebaseapp.com",
+  databaseURL: "https://mhf-foundation-default-rtdb.firebaseio.com",
+  projectId: "mhf-foundation",
+  storageBucket: "mhf-foundation.firebasestorage.app",
+  messagingSenderId: "935003103652",
+  appId: "1:935003103652:web:6bd9c4692553cd8c45e131"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Tab Switch
+window.showTab = (tabName) => {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+    document.getElementById(tabName).classList.remove('hidden');
+    event.target.classList.add('tab-active');
+}
+
+// Save Settings
+window.saveSettings = () => {
+    set(ref(db, 'settings'), {
+        phone1: phone1.value,
+        phone2: phone2.value,
+        fb: fb.value,
+        yt: yt.value,
+        address: address.value
+    });
+    alert('সেটিংস সেভ হয়েছে!');
+}
+
+// Load Settings
+onValue(ref(db, 'settings'), (snapshot) => {
+    const data = snapshot.val();
+    if(data){
+        phone1.value = data.phone1 || '';
+        phone2.value = data.phone2 || '';
+        fb.value = data.fb || '';
+        yt.value = data.yt || '';
+        address.value = data.address || '';
+    }
+});
+
+// Add Committee
+window.addCommittee = () => {
+    if(!c_name.value || !c_post.value) return alert('নাম ও পদবী দিন!');
+    push(ref(db, 'committee'), {
+        name: c_name.value,
+        post: c_post.value,
+        img: c_img.value,
+        phone: c_phone.value
+    });
+    c_name.value = c_post.value = c_img.value = c_phone.value = '';
+    alert('কমিটি সদস্য যোগ হয়েছে!');
+}
+
+// Load Committee
+onValue(ref(db, 'committee'), (snapshot) => {
+    committee_list.innerHTML = '';
+    snapshot.forEach((child) => {
+        const data = child.val();
+        committee_list.innerHTML += `
+        <div class="border p-3 rounded-lg text-center">
+            <img src="${data.img}" class="w-24 h-24 object-cover rounded-full mx-auto mb-2">
+            <h3 class="font-bold">${data.name}</h3>
+            <p class="text-sm text-green-700">${data.post}</p>
+            <button onclick="deleteItem('committee','${child.key}')" class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm">ডিলিট</button>
+        </div>`;
+    });
+});
+
+// Add Gallery
+window.addGallery = () => {
+    if(!g_title.value || !g_img.value) return alert('টাইটেল ও ছবির লিংক দিন!');
+    push(ref(db, 'gallery'), { title: g_title.value, img: g_img.value });
+    g_title.value = g_img.value = '';
+    alert('গ্যালারিতে ছবি যোগ হয়েছে!');
+}
+
+// Load Gallery
+onValue(ref(db, 'gallery'), (snapshot) => {
+    gallery_list.innerHTML = '';
+    snapshot.forEach((child) => {
+        const data = child.val();
+        gallery_list.innerHTML += `
+        <div class="border p-2 rounded-lg">
+            <img src="${data.img}" class="w-full h-32 object-cover rounded mb-2">
+            <p class="text-sm font-semibold text-center">${data.title}</p>
+            <button onclick="deleteItem('gallery','${child.key}')" class="w-full mt-2 bg-red-500 text-white px-2 py-1 rounded text-sm">ডিলিট</button>
+        </div>`;
+    });
+});
+
+// Add YouTube
+window.addYoutube = () => {
+    if(!y_title.value || !y_link.value) return alert('টাইটেল ও লিংক দিন!');
+    push(ref(db, 'youtube'), { title: y_title.value, link: y_link.value });
+    y_title.value = y_link.value = '';
+    alert('YouTube ভিডিও যোগ হয়েছে!');
+}
+
+// Load YouTube
+onValue(ref(db, 'youtube'), (snapshot) => {
+    youtube_list.innerHTML = '';
+    snapshot.forEach((child) => {
+        const data = child.val();
+        youtube_list.innerHTML += `
+        <div class="border p-2 rounded-lg">
+            <iframe class="w-full h-40" src="${data.link}" frameborder="0"></iframe>
+            <p class="text-sm font-semibold mt-2">${data.title}</p>
+            <button onclick="deleteItem('youtube','${child.key}')" class="w-full mt-2 bg-red-500 text-white px-2 py-1 rounded text-sm">ডিলিট</button>
+        </div>`;
+    });
+});
+
+// Delete Function
+window.deleteItem = (path, key) => {
+    if(confirm('ডিলিট করবেন?')){
+        remove(ref(db, `${path}/${key}`));
+    }
+}
+</script>
+</body>
+</html>
