@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHF Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+<div id="loginBox" class="min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-lg shadow w-96">
+    <h1 class="text-2xl font-bold text-center mb-6">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+    <input id="passInput" type="password" placeholder="পাসওয়ার্ড দিন" class="w-full border p-3 rounded mb-4">
+    <button onclick="doLogin()" class="w-full bg-blue-600 text-white p-3 rounded font-bold">লগইন</button>
+    <p class="text-xs text-center mt-4 text-gray-500">Default: mhf2024</p>
+    <p id="msg" class="text-center mt-2 text-red-500"></p>
+  </div>
+</div>
+
+<div id="dashboard" style="display:none" class="p-8">
+  <h1 class="text-3xl font-bold text-green-600">লগইন সফল ✅</h1>
+  <p class="mt-4">ভাই এইবার কাজ হইছে। এখন বাকি ফিচার যোগ করবো।</p>
+  <button onclick="doLogout()" class="bg-red-500 text-white px-4 py-2 rounded mt-4">লগআউট</button>
+</div>
+
+<script>
+function doLogin() {
+  let p = document.getElementById('passInput').value;
+  if(p === 'mhf2024') {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+  } else {
+    document.getElementById('msg').innerText = 'ভুল পাসওয়ার্ড! mhf2024 লিখুন';
+  }
+}
+
+function doLogout() {
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginBox').style.display = 'flex';
+  document.getElementById('passInput').value = '';
+}
+</script>
+
+</body>
+</html>
