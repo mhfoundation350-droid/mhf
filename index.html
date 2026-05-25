@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>মেঘনা হিউম্যানিটি ফাউন্ডেশন</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+<div class="bg-blue-900 text-white p-6 text-center">
+  <h1 class="text-3xl font-bold" id="siteName">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+  <p class="mt-2" id="siteAddress">মানবতার সেবায় নিবেদিত</p>
+</div>
+
+<div class="container mx-auto p-4">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+    <div class="bg-green-600 text-white p-6 rounded-lg text-center shadow">
+      <h3 class="text-lg">মোট সংগ্রহ</h3>
+      <p class="text-4xl font-bold mt-2" id="totalIncome">0 টাকা</p>
+    </div>
+    <div class="bg-red-600 text-white p-6 rounded-lg text-center shadow">
+      <h3 class="text-lg">মোট ব্যয়</h3>
+      <p class="text-4xl font-bold mt-2" id="totalExpense">0 টাকা</p>
+    </div>
+    <div class="bg-blue-600 text-white p-6 rounded-lg text-center shadow">
+      <h3 class="text-lg">বর্তমান তহবিল</h3>
+      <p class="text-4xl font-bold mt-2" id="currentCash">0 টাকা</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-bold mb-4 border-b pb-2">সর্বশেষ দান</h2>
+      <div id="donationsList" class="space-y-2">লোড হচ্ছে...</div>
+    </div>
+    
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-bold mb-4 border-b pb-2">সর্বশেষ খরচ</h2>
+      <div id="expensesList" class="space-y-2">লোড হচ্ছে...</div>
+    </div>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg shadow mt-6">
+    <h2 class="text-xl font-bold mb-4 border-b pb-2">চলমান প্রজেক্ট</h2>
+    <div id="projectsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">লোড হচ্ছে...</div>
+  </div>
+
+  <div class="bg-yellow-100 p-6 rounded-lg shadow mt-6 text-center">
+    <h2 class="text-xl font-bold mb-3">দান করতে</h2>
+    <p class="text-lg"><b>বিকাশ:</b> <span id="bkashNum">লোড হচ্ছে...</span></p>
+    <p class="text-lg"><b>নগদ:</b> <span id="nagadNum">লোড হচ্ছে...</span></p>
+  </div>
+</div>
+
+<footer class="bg-gray-800 text-white text-center p-4 mt-8">
+  <p>© 2026 মেঘনা হিউম্যানিটি ফাউন্ডেশন</p>
+</footer>
+
+<script>
+const REPO = 'mhfoundation350-droid/mhf';
+
+async function getFile(file) {
+  const res = await fetch(`https://api.github.com/repos/${REPO}/contents/data/${file}.json`);
+  const data = await res.json();
+  return JSON.parse(atob(data.content));
+}
+
+async function loadData() {
+  try {
+    const [d, e, p, s] = await Promise.all([
+      getFile('donations'), getFile('expenses'), getFile('projects'), getFile('settings')
+    ]);
+    
+    let income = d.reduce((sum,i) => sum + Number(i.amount||0), 0);
+    let expense = e.reduce((sum,i) => sum + Number(i.amount||0), 0);
+    
+    document.getElementById('totalIncome').innerText = income.toLocaleString('bn-BD') + ' টাকা';
+    document.getElementById('totalExpense').innerText = expense.toLocaleString('bn-BD') + ' টাকা';
+    document.getElementById('currentCash').innerText = (income-expense).toLocaleString('bn-BD') + ' টাকা';
+    
+    document.getElementById('siteName').innerText = s.name || 'মেঘনা হিউম্যানিটি ফাউন্ডেশন';
+    document.getElementById('siteAddress').innerText = s.address || '';
+    document.getElementById('bkashNum').innerText = s.bkash || 'নেই';
+    document.getElementById('nagadNum').innerText = s.nagad || 'নেই';
+    
+    let dHtml = d.slice(-5).reverse().map(i => 
+      `<div class="flex justify-between border-b py-2"><span>${i.name}</span><span class="font-bold text-green-600">${Number(i.amount).toLocaleString('bn-BD')} ৳</span></div>`
+    ).join('');
+    document.getElementById('donationsList').innerHTML = dHtml || 'কোনো দান নেই';
+    
+    let eHtml = e.slice(-5).reverse().map(i => 
+      `<div class="flex justify-between border-b py-2"><span>${i.purpose}</span><span class="font-bold text-red-600">${Number(i.amount).toLocaleString('bn-BD')} ৳</span></div>`
+    ).join('');
+    document.getElementById('expensesList').innerHTML = eHtml || 'কোনো খরচ নেই';
+    
+    let pHtml = p.filter(i => i.status === 'চলমান').map(i => `
+      <div class="border p-4 rounded">
+        <h3 class="font-bold text-lg">${i.title}</h3>
+        <p class="text-sm text-gray-600 my-2">${i.details||''}</p>
+        <p><b>টার্গেট:</b> ${Number(i.target||0).toLocaleString('bn-BD')} ৳</p>
+        <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded">${i.status}</span>
+      </div>
+    `).join('');
+    document.getElementById('projectsList').innerHTML = pHtml || 'কোনো চলমান প্রজেক্ট নেই';
+    
+  } catch(e) { console.log('Error:', e); }
+}
+
+loadData();
+setInterval(loadData, 60000); // প্রতি 1 মিনিটে অটো রিফ্রেশ
+</script>
+
+</body>
+</html>
