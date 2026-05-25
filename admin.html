@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHF Admin - Token ছাড়া</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.tab-btn.active { background: #059669; color: white; }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+<div id="loginBox" class="min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+    <h1 class="text-2xl font-bold text-center mb-6 text-emerald-700">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+    <input id="passInput" type="password" placeholder="অ্যাডমিন পাসওয়ার্ড" class="w-full border p-3 rounded mb-4">
+    <button onclick="doLogin()" class="w-full bg-emerald-600 text-white p-3 rounded font-bold">লগইন করুন</button>
+    <p id="msg" class="text-center mt-2 text-red-500"></p>
+  </div>
+</div>
+
+<div id="dashboard" style="display:none">
+  <div class="bg-emerald-800 text-white p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold"><i class="fas fa-shield-halved"></i> MHF কন্ট্রোল প্যানেল</h1>
+    <div>
+      <button onclick="exportData()" class="bg-blue-500 px-3 py-2 rounded mr-2"><i class="fas fa-download"></i> Backup</button>
+      <button onclick="doLogout()" class="bg-red-500 px-4 py-2 rounded"><i class="fas fa-sign-out-alt"></i> লগআউট</button>
+    </div>
+  </div>
+
+  <div class="p-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-green-600 text-white p-6 rounded-lg shadow">
+        <h3 class="text-lg"><i class="fas fa-hand-holding-dollar"></i> মোট আয়</h3>
+        <p class="text-3xl font-bold" id="totalIncome">0 টাকা</p>
+      </div>
+      <div class="bg-red-600 text-white p-6 rounded-lg shadow">
+        <h3 class="text-lg"><i class="fas fa-money-bill-wave"></i> মোট ব্যয়</h3>
+        <p class="text-3xl font-bold" id="totalExpense">0 টাকা</p>
+      </div>
+      <div class="bg-blue-600 text-white p-6 rounded-lg shadow">
+        <h3 class="text-lg"><i class="fas fa-wallet"></i> বর্তমান ক্যাশ</h3>
+        <p class="text-3xl font-bold" id="currentCash">0 টাকা</p>
+      </div>
+      <div class="bg-purple-600 text-white p-6 rounded-lg shadow">
+        <h3 class="text-lg"><i class="fas fa-diagram-project"></i> মোট প্রজেক্ট</h3>
+        <p class="text-3xl font-bold" id="totalProject">0 টি</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded shadow mb-6">
+      <div class="flex border-b overflow-x-auto">
+        <button onclick="showTab('donations')" class="tab-btn px-4 py-3 font-bold active"><i class="fas fa-donate"></i> দান</button>
+        <button onclick="showTab('expenses')" class="tab-btn px-4 py-3 font-bold"><i class="fas fa-receipt"></i> খরচ</button>
+        <button onclick="showTab('projects')" class="tab-btn px-4 py-3 font-bold"><i class="fas fa-list-check"></i> প্রজেক্ট</button>
+        <button onclick="showTab('medical')" class="tab-btn px-4 py-3 font-bold"><i class="fas fa-hospital"></i> মেডিকেল ক্যাম্প</button>
+        <button onclick="showTab('students')" class="tab-btn px-4 py-3 font-bold"><i class="fas fa-graduation-cap"></i> শিক্ষা সহায়তা</button>
+        <button onclick="showTab('members')" class="tab-btn px-4 py-3 font-bold"><i class="fas fa-users"></i> সদস্য</button>
+        <button onclick="showTab('news')" class="tab-btn px-4 py-3 font-bold"><i class="fas fa-newspaper"></i> নিউজ</button>
+        <button onclick="showTab('gallery')" class="tab-btn px-4 py-3 font-bold"><i class="fas fa-images"></i> গ্যালারি</button>
+        <button onclick="showTab('settings')" class="tab-btn px-4 py-3 font-bold"><i class="fas fa-cog"></i> সেটিংস</button>
+      </div>
+
+      <!-- দান -->
+      <div id="donations" class="tab-content active p-4">
+        <h2 class="text-xl font-bold mb-4">দান ম্যানেজ</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+          <input id="dName" placeholder="দাতার নাম" class="border p-2 rounded">
+          <input id="dAmount" type="number" placeholder="টাকার পরিমাণ" class="border p-2 rounded">
+          <input id="dDate" type="date" class="border p-2 rounded">
+          <input id="dReceipt" placeholder="রশিদ নং" class="border p-2 rounded">
+          <input id="dPhone" placeholder="ফোন নম্বর" class="border p-2 rounded">
+          <input id="dAddress" placeholder="ঠিকানা" class="border p-2 rounded">
+        </div>
+        <button onclick="addItem('donations')" class="bg-green-600 text-white px-6 py-2 rounded mb-4">দান যোগ করুন</button>
+        <div id="donationsList"></div>
+      </div>
+
+      <!-- খরচ -->
+      <div id="expenses" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">খরচ ম্যানেজ</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+          <input id="ePurpose" placeholder="খরচের খাত" class="border p-2 rounded">
+          <input id="eAmount" type="number" placeholder="টাকার পরিমাণ" class="border p-2 rounded">
+          <input id="eDate" type="date" class="border p-2 rounded">
+          <input id="eVoucher" placeholder="ভাউচার নং" class="border p-2 rounded">
+          <select id="eProject" class="border p-2 rounded"><option value="">প্রজেক্ট সিলেক্ট</option></select>
+          <input id="eDetails" placeholder="বিস্তারিত" class="border p-2 rounded">
+        </div>
+        <button onclick="addItem('expenses')" class="bg-red-600 text-white px-6 py-2 rounded mb-4">খরচ যোগ করুন</button>
+        <div id="expensesList"></div>
+      </div>
+
+      <!-- প্রজেক্ট -->
+      <div id="projects" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">প্রজেক্ট ম্যানেজ</h2>
+        <div class="grid grid-cols-1 gap-2 mb-3">
+          <input id="pTitle" placeholder="প্রজেক্টের নাম" class="border p-2 rounded">
+          <textarea id="pDetails" placeholder="বিস্তারিত বিবরণ" class="border p-2 rounded"></textarea>
+          <input id="pTarget" type="number" placeholder="টার্গেট টাকা" class="border p-2 rounded">
+          <input id="pImage" placeholder="ছবির লিংক" class="border p-2 rounded">
+          <select id="pStatus" class="border p-2 rounded">
+            <option value="চলমান">চলমান</option>
+            <option value="সম্পন্ন">সম্পন্ন</option>
+            <option value="পরিকল্পিত">পরিকল্পিত</option>
+          </select>
+        </div>
+        <button onclick="addItem('projects')" class="bg-blue-600 text-white px-6 py-2 rounded mb-4">প্রজেক্ট যোগ করুন</button>
+        <div id="projectsList"></div>
+      </div>
+
+      <!-- মেডিকেল ক্যাম্প -->
+      <div id="medical" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">ফ্রি মেডিকেল ক্যাম্প</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+          <input id="mcTitle" placeholder="ক্যাম্পের নাম" class="border p-2 rounded">
+          <input id="mcDate" type="date" class="border p-2 rounded">
+          <input id="mcLocation" placeholder="স্থান" class="border p-2 rounded">
+          <input id="mcDoctor" placeholder="ডাক্তারের নাম" class="border p-2 rounded">
+          <input id="mcPatient" type="number" placeholder="রোগীর সংখ্যা" class="border p-2 rounded">
+          <input id="mcImage" placeholder="ছবির লিংক" class="border p-2 rounded">
+          <textarea id="mcDetails" placeholder="বিস্তারিত" class="border p-2 rounded md:col-span-2"></textarea>
+        </div>
+        <button onclick="addItem('medical-camps')" class="bg-pink-600 text-white px-6 py-2 rounded mb-4">ক্যাম্প যোগ করুন</button>
+        <div id="medical-campsList"></div>
+      </div>
+
+      <!-- শিক্ষা সহায়তা -->
+      <div id="students" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">স্কুলের শিক্ষা সহায়তা</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+          <input id="stName" placeholder="ছাত্র/ছাত্রীর নাম" class="border p-2 rounded">
+          <input id="stClass" placeholder="ক্লাস" class="border p-2 rounded">
+          <input id="stSchool" placeholder="স্কুলের নাম" class="border p-2 rounded">
+          <input id="stAmount" type="number" placeholder="সহায়তার পরিমাণ" class="border p-2 rounded">
+          <input id="stDate" type="date" class="border p-2 rounded">
+          <input id="stGuardian" placeholder="অভিভাবকের নাম" class="border p-2 rounded">
+        </div>
+        <button onclick="addItem('students')" class="bg-indigo-600 text-white px-6 py-2 rounded mb-4">ছাত্র যোগ করুন</button>
+        <div id="studentsList"></div>
+      </div>
+
+      <!-- সদস্য -->
+      <div id="members" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">সদস্য ম্যানেজ</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+          <input id="mName" placeholder="নাম" class="border p-2 rounded">
+          <input id="mPost" placeholder="পদবী - সভাপতি/সদস্য" class="border p-2 rounded">
+          <input id="mPhone" placeholder="ফোন" class="border p-2 rounded">
+          <input id="mImage" placeholder="ছবির লিংক" class="border p-2 rounded">
+          <input id="mBlood" placeholder="রক্তের গ্রুপ" class="border p-2 rounded">
+          <input id="mAddress" placeholder="ঠিকানা" class="border p-2 rounded">
+        </div>
+        <button onclick="addItem('members')" class="bg-teal-600 text-white px-6 py-2 rounded mb-4">সদস্য যোগ করুন</button>
+        <div id="membersList"></div>
+      </div>
+
+      <!-- নিউজ -->
+      <div id="news" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">নিউজ ম্যানেজ</h2>
+        <div class="grid grid-cols-1 gap-2 mb-3">
+          <input id="nTitle" placeholder="নিউজের শিরোনাম" class="border p-2 rounded">
+          <textarea id="nDetails" placeholder="বিস্তারিত" class="border p-2 rounded"></textarea>
+          <input id="nDate" type="date" class="border p-2 rounded">
+          <input id="nImage" placeholder="ছবির লিংক" class="border p-2 rounded">
+        </div>
+        <button onclick="addItem('news')" class="bg-orange-600 text-white px-6 py-2 rounded mb-4">নিউজ যোগ করুন</button>
+        <div id="newsList"></div>
+      </div>
+
+      <!-- গ্যালারি -->
+      <div id="gallery" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">গ্যালারি ম্যানেজ</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+          <input id="gTitle" placeholder="ছবির টাইটেল" class="border p-2 rounded">
+          <input id="gImage" placeholder="ছবির লিংক" class="border p-2 rounded">
+          <select id="gCategory" class="border p-2 rounded">
+            <option value="মেডিকেল ক্যাম্প">মেডিকেল ক্যাম্প</option>
+            <option value="শিক্ষা সহায়তা">শিক্ষা সহায়তা</option>
+            <option value="ত্রাণ বিতরণ">ত্রাণ বিতরণ</option>
+            <option value="অন্যান্য">অন্যান্য</option>
+          </select>
+          <input id="gDate" type="date" class="border p-2 rounded">
+        </div>
+        <button onclick="addItem('gallery')" class="bg-purple-600 text-white px-6 py-2 rounded mb-4">ছবি যোগ করুন</button>
+        <div id="galleryList"></div>
+      </div>
+
+      <!-- সেটিংস -->
+      <div id="settings" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">ফাউন্ডেশন সেটিংস</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+          <input id="sName" placeholder="ফাউন্ডেশনের নাম" class="border p-2 rounded">
+          <input id="sBkash" placeholder="বিকাশ নম্বর" class="border p-2 rounded">
+          <input id="sNagad" placeholder="নগদ নম্বর" class="border p-2 rounded">
+          <input id="sPhone" placeholder="ফোন নম্বর" class="border p-2 rounded">
+          <input id="sEmail" placeholder="ইমেইল" class="border p-2 rounded">
+          <input id="sFacebook" placeholder="ফেসবুক লিংক" class="border p-2 rounded">
+          <textarea id="sAddress" placeholder="ঠিকানা" class="border p-2 rounded md:col-span-2"></textarea>
+          <textarea id="sAbout" placeholder="আমাদের সম্পর্কে" class="border p-2 rounded md:col-span-2"></textarea>
+        </div>
+        <button onclick="saveSettings()" class="bg-emerald-600 text-white px-6 py-2 rounded">সেটিংস সেভ করুন</button>
+        <p class="text-sm text-gray-600 mt-3">নোট: এই ডাটা শুধু তোমার ব্রাউজারে সেভ হবে। পাবলিক সাইটে দেখাতে চাইলে GitHub এর settings.json এ ম্যানুয়ালি আপডেট করো।</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let DB = {};
+
+async function loadFromGitHub() {
+  const files = ['donations','expenses','projects','medical-camps','students','members','news','gallery','settings'];
+  for(let f of files) {
+    try {
+      let res = await fetch(`data/${f}.json`);
+      DB[f] = await res.json();
+    } catch(e) { DB[f] = f==='settings' ? {} : []; }
+  }
+  let local = localStorage.getItem('mhf_db');
+  if(local) {
+    let localDB = JSON.parse(local);
+    Object.keys(localDB).forEach(k => { if(localDB[k].length) DB[k] = localDB[k]; });
+  }
+}
+
+window.onload = async () => {
+  await loadFromGitHub();
+  let today = new Date().toISOString().split('T')[0];
+  ['dDate','eDate','mcDate','stDate','nDate','gDate'].forEach(id => document.getElementById(id).value = today);
+}
+
+function doLogin() {
+  if(document.getElementById('passInput').value === 'mhf2024') {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadAll();
+  } else {
+    document.getElementById('msg').innerText = 'ভুল পাসওয়ার্ড!';
+  }
+}
+
+function doLogout() {
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginBox').style.display = 'flex';
+  document.getElementById('passInput').value = '';
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function saveDB() {
+  localStorage.setItem('mhf_db', JSON.stringify(DB));
+}
+
+function loadAll() {
+  let income = DB.donations.reduce((sum,i) => sum + Number(i.amount||0), 0);
+  let expense = DB.expenses.reduce((sum,i) => sum + Number(i.amount||0), 0);
+  document.getElementById('totalIncome').innerText = income.toLocaleString('bn-BD') + ' টাকা';
+  document.getElementById('totalExpense').innerText = expense.toLocaleString('bn-BD') + ' টাকা';
+  document.getElementById('currentCash').innerText = (income-expense).toLocaleString('bn-BD') + ' টাকা';
+  document.getElementById('totalProject').innerText = DB.projects.length + ' টি';
+
+  let pSelect = document.getElementById('eProject');
+  pSelect.innerHTML = '<option value="">প্রজেক্ট সিলেক্ট</option>';
+  DB.projects.forEach(p => pSelect.innerHTML += `<option value="${p.title}">${p.title}</option>`);
+
+  ['donations','expenses','projects','medical-camps','students','members','news','gallery'].forEach(renderTable);
+
+  let s = DB.settings || {};
+  ['sName','sBkash','sNagad','sPhone','sEmail','sFacebook','sAddress','sAbout'].forEach(id => {
+    document.getElementById(id).value = s[id.substring(1)] || '';
+  });
+}
+
+function renderTable(type) {
+  let data = DB[type] || [];
+  let fields = {
+    donations: ['name','amount','date','receipt','phone'],
+    expenses: ['purpose','amount','date','voucher','project'],
+    projects: ['title','target','status'],
+    'medical-camps': ['title','date','location','doctor','patient'],
+    students: ['name','class','school','amount','date'],
+    members: ['name','post','phone','blood'],
+    news: ['title','date'],
+    gallery: ['title','category','date']
+  }[type];
+  let html = '<div class="overflow-x-auto"><table class="w-full border text-sm"><thead class="bg-gray-200"><tr>';
+  fields.forEach(f => html += `<th class="p-2 border">${f}</th>`);
+  html += '<th class="p-2 border">অ্যাকশন</th></tr></thead><tbody>';
+  data.forEach((item, i) => {
+    html += '<tr>';
+    fields.forEach(f => html += `<td class="p-2 border">${item[f]||''}</td>`);
+    html += `<td class="p-2 border"><button onclick="deleteItem('${type}',${i})" class="bg-red-500 text-white px-3 py-1 rounded text-xs">ডিলেট</button></td></tr>`;
+  });
+  document.getElementById(type+'List').innerHTML = data.length? html+'</tbody></table></div>' : '<p class="text-gray-500">কোনো ডাটা নেই</p>';
+}
+
+function addItem(type) {
+  let item = { id: Date.now() };
+  const map = {
+    donations: ['dName:name','dAmount:amount','dDate:date','dReceipt:receipt','dPhone:phone','dAddress:address'],
+    expenses: ['ePurpose:purpose','eAmount:amount','eDate:date','eVoucher:voucher','eProject:project','eDetails:details'],
+    projects: ['pTitle:title','pDetails:details','pTarget:target','pStatus:status','pImage:image'],
+    'medical-camps': ['mcTitle:title','mcDate:date','mcLocation:location','mcDoctor:doctor','mcPatient:patient','mcImage:image','mcDetails:details'],
+    students: ['stName:name','stClass:class','stSchool:school','stAmount:amount','stDate:date','stGuardian:guardian'],
+    members: ['mName:name','mPost:post','mPhone:phone','mImage:image','mBlood:blood','mAddress:address'],
+    news: ['nTitle:title','nDetails:details','nDate:date','nImage:image'],
+    gallery: ['gTitle:title','gImage:image','gCategory:category','gDate:date']
+  };
+  map[type].forEach(m => { let [id,key] = m.split(':'); item[key] = document.getElementById(id).value; });
+  
+  if(!DB[type]) DB[type] = [];
+  DB[type].push(item);
+  saveDB();
+  alert('সফলভাবে যোগ হয়েছে! এখন Backup বাটনে ক্লিক করে data ফোল্ডারে আপলোড করো।');
+  loadAll();
+  document.querySelectorAll(`#${type} input, #${type} textarea`).forEach(el => el.value = '');
+}
+
+function deleteItem(type, index) {
+  if(!confirm('ডিলেট করবেন?')) return;
+  DB[type].splice(index, 1);
+  saveDB();
+  alert('ডিলেট হয়েছে! Backup করে data ফোল্ডারে আপলোড করো।');
+  loadAll();
+}
+
+function saveSettings() {
+  DB.settings = {
+    name: sName.value, bkash: sBkash.value, nagad: sNagad.value,
+    phone: sPhone.value, email: sEmail.value, facebook: sFacebook.value,
+    address: sAddress.value, about: sAbout.value
+  };
+  saveDB();
+  alert('সেটিংস সেভ হয়েছে! Backup করে settings.json আপলোড করো।');
+}
+
+function exportData() {
+  let dataStr = JSON.stringify(DB, null, 2);
+  let blob = new Blob([dataStr], {type: 'application/json'});
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = `mhf_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  alert('Backup ডাউনলোড হয়েছে! এই ফাইল থেকে data ফোল্ডারের json গুলো আপডেট করো।');
+}
+</script>
+
+</body>
+</html>
