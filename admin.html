@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHF Admin - Full Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-btn.active { background: #1e40af; color: white; }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+<div id="loginBox" class="min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-lg shadow w-96">
+    <h1 class="text-2xl font-bold text-center mb-6">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+    <input id="passInput" type="password" placeholder="পাসওয়ার্ড দিন" class="w-full border p-3 rounded mb-4">
+    <button onclick="doLogin()" class="w-full bg-blue-600 text-white p-3 rounded font-bold">লগইন</button>
+    <p id="msg" class="text-center mt-2 text-red-500"></p>
+  </div>
+</div>
+
+<div id="dashboard" style="display:none">
+  <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">MHF অ্যাডমিন প্যানেল</h1>
+    <button onclick="doLogout()" class="bg-red-500 px-4 py-2 rounded">লগআউট</button>
+  </div>
+
+  <div class="p-4">
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6">
+      <p class="font-bold">GitHub Token:</p>
+      <input id="tokenInput" type="password" placeholder="ghp_xxxxxxxx" class="border p-2 rounded w-full mt-2">
+      <button onclick="saveToken()" class="bg-green-600 text-white px-4 py-2 rounded mt-2">সেভ করুন</button>
+      <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" class="text-blue-600 underline text-sm ml-2">নতুন Token</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-green-600 text-white p-6 rounded-lg">
+        <h3 class="text-lg">মোট আয়</h3>
+        <p class="text-3xl font-bold" id="totalIncome">0 টাকা</p>
+      </div>
+      <div class="bg-red-600 text-white p-6 rounded-lg">
+        <h3 class="text-lg">মোট ব্যয়</h3>
+        <p class="text-3xl font-bold" id="totalExpense">0 টাকা</p>
+      </div>
+      <div class="bg-blue-600 text-white p-6 rounded-lg">
+        <h3 class="text-lg">বর্তমান ক্যাশ</h3>
+        <p class="text-3xl font-bold" id="currentCash">0 টাকা</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded shadow mb-6">
+      <div class="flex border-b overflow-x-auto">
+        <button onclick="showTab('donations')" class="tab-btn px-6 py-3 font-bold active">দান</button>
+        <button onclick="showTab('expenses')" class="tab-btn px-6 py-3 font-bold">খরচ</button>
+        <button onclick="showTab('projects')" class="tab-btn px-6 py-3 font-bold">প্রজেক্ট</button>
+        <button onclick="showTab('settings')" class="tab-btn px-6 py-3 font-bold">সেটিংস</button>
+      </div>
+
+      <div id="donations" class="tab-content active p-4">
+        <h2 class="text-xl font-bold mb-4">দান ম্যানেজ</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+          <input id="dName" placeholder="দাতার নাম" class="border p-2 rounded">
+          <input id="dAmount" type="number" placeholder="টাকার পরিমাণ" class="border p-2 rounded">
+          <input id="dDate" type="date" class="border p-2 rounded">
+          <input id="dReceipt" placeholder="রশিদ নং" class="border p-2 rounded">
+        </div>
+        <button onclick="addItem('donations')" class="bg-green-600 text-white px-6 py-2 rounded mb-4">দান যোগ করুন</button>
+        <div id="donationsList"></div>
+      </div>
+
+      <div id="expenses" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">খরচ ম্যানেজ</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+          <input id="ePurpose" placeholder="খরচের খাত" class="border p-2 rounded">
+          <input id="eAmount" type="number" placeholder="টাকার পরিমাণ" class="border p-2 rounded">
+          <input id="eDate" type="date" class="border p-2 rounded">
+          <input id="eVoucher" placeholder="ভাউচার নং" class="border p-2 rounded">
+        </div>
+        <button onclick="addItem('expenses')" class="bg-red-600 text-white px-6 py-2 rounded mb-4">খরচ যোগ করুন</button>
+        <div id="expensesList"></div>
+      </div>
+
+      <div id="projects" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">প্রজেক্ট ম্যানেজ</h2>
+        <div class="grid grid-cols-1 gap-2 mb-3">
+          <input id="pTitle" placeholder="প্রজেক্টের নাম" class="border p-2 rounded">
+          <textarea id="pDetails" placeholder="বিস্তারিত" class="border p-2 rounded"></textarea>
+          <input id="pTarget" type="number" placeholder="টার্গেট টাকা" class="border p-2 rounded">
+          <select id="pStatus" class="border p-2 rounded">
+            <option value="চলমান">চলমান</option>
+            <option value="সম্পন্ন">সম্পন্ন</option>
+          </select>
+        </div>
+        <button onclick="addItem('projects')" class="bg-blue-600 text-white px-6 py-2 rounded mb-4">প্রজেক্ট যোগ করুন</button>
+        <div id="projectsList"></div>
+      </div>
+
+      <div id="settings" class="tab-content p-4">
+        <h2 class="text-xl font-bold mb-4">ওয়েবসাইট সেটিংস</h2>
+        <div class="grid grid-cols-1 gap-2 mb-3">
+          <input id="sName" placeholder="ফাউন্ডেশনের নাম" class="border p-2 rounded">
+          <input id="sBkash" placeholder="বিকাশ নম্বর" class="border p-2 rounded">
+          <input id="sNagad" placeholder="নগদ নম্বর" class="border p-2 rounded">
+          <textarea id="sAddress" placeholder="ঠিকানা" class="border p-2 rounded"></textarea>
+        </div>
+        <button onclick="saveSettings()" class="bg-purple-600 text-white px-6 py-2 rounded">সেটিংস সেভ করুন</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const REPO = 'mhfoundation350-droid/mhf';
+  const TOKEN'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
+
+window.onload = () => {
+  if(TOKEN) document.getElementById('tokenInput').value = TOKEN;
+  let today = new Date().toISOString().split('T')[0];
+  document.getElementById('dDate').value = today;
+  document.getElementById('eDate').value = today;
+}
+
+function doLogin() {
+  if(document.getElementById('passInput').value === 'mhf2024') {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadAll();
+  } else {
+    document.getElementById('msg').innerText = 'ভুল পাসওয়ার্ড!';
+  }
+}
+
+function doLogout() {
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginBox').style.display = 'flex';
+  document.getElementById('passInput').value = '';
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function saveToken() {
+  TOKEN = document.getElementById('tokenInput').value.trim();
+  localStorage.setItem('mhf_token', TOKEN);
+  alert('Token সেভ হয়েছে!');
+  loadAll();
+}
+
+async function api(file, method='GET', body=null, sha=null) {
+  let opt = { headers: { 'Authorization': `token ${TOKEN}` } };
+  if(method === 'PUT') {
+    opt.method = 'PUT';
+    opt.body = JSON.stringify({
+      message: `Update ${file}`,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(body)))),
+      sha: sha,
+      branch: 'main'
+    });
+  }
+  const res = await fetch(`https://api.github.com/repos/${REPO}/contents/data/${file}.json`, opt);
+  return await res.json();
+}
+
+async function getFile(file) {
+  const data = await api(file);
+  return { content: JSON.parse(atob(data.content)), sha: data.sha };
+}
+
+async function loadAll() {
+  if(!TOKEN) return;
+  try {
+    const [d, e, p, s] = await Promise.all([
+      getFile('donations'), getFile('expenses'), getFile('projects'), getFile('settings')
+    ]);
+    
+    let income = d.content.reduce((sum,i) => sum + Number(i.amount||0), 0);
+    let expense = e.content.reduce((sum,i) => sum + Number(i.amount||0), 0);
+    
+    document.getElementById('totalIncome').innerText = income.toLocaleString('bn-BD') + ' টাকা';
+    document.getElementById('totalExpense').innerText = expense.toLocaleString('bn-BD') + ' টাকা';
+    document.getElementById('currentCash').innerText = (income-expense).toLocaleString('bn-BD') + ' টাকা';
+    
+    renderTable('donations', d.content, ['name','amount','date','receipt']);
+    renderTable('expenses', e.content, ['purpose','amount','date','voucher']);
+    renderTable('projects', p.content, ['title','target','status']);
+    
+    document.getElementById('sName').value = s.content.name || '';
+    document.getElementById('sBkash').value = s.content.bkash || '';
+    document.getElementById('sNagad').value = s.content.nagad || '';
+    document.getElementById('sAddress').value = s.content.address || '';
+  } catch(e) { alert('এরর: ' + e.message + '\nToken ও data ফাইল চেক করুন'); }
+}
+
+function renderTable(type, data, fields) {
+  let html = '<table class="w-full border text-sm"><thead class="bg-gray-200"><tr>';
+  fields.forEach(f => html += `<th class="p-2 border">${f}</th>`);
+  html += '<th class="p-2 border">অ্যাকশন</th></tr></thead><tbody>';
+  data.forEach((item, i) => {
+    html += '<tr>';
+    fields.forEach(f => html += `<td class="p-2 border">${item[f]||''}</td>`);
+    html += `<td class="p-2 border"><button onclick="deleteItem('${type}',${i})" class="bg-red-500 text-white px-3 py-1 rounded text-xs">ডিলেট</button></td></tr>`;
+  });
+  document.getElementById(type+'List').innerHTML = data.length? html+'</tbody></table>' : '<p class="text-gray-500">কোনো ডাটা নেই</p>';
+}
+
+async function addItem(type) {
+  if(!TOKEN) return alert('আগে Token সেভ করুন');
+  try {
+    const { content, sha } = await getFile(type);
+    let item = { id: Date.now() };
+    
+    if(type === 'donations') {
+      item.name = dName.value; item.amount = dAmount.value; item.date = dDate.value; item.receipt = dReceipt.value;
+      if(!item.name ||!item.amount) return alert('নাম ও টাকা দিন');
+    }
+    if(type === 'expenses') {
+      item.purpose = ePurpose.value; item.amount = eAmount.value; item.date = eDate.value; item.voucher = eVoucher.value;
+      if(!item.purpose ||!item.amount) return alert('খাত ও টাকা দিন');
+    }
+    if(type === 'projects') {
+      item.title = pTitle.value; item.details = pDetails.value; item.target = pTarget.value; item.status = pStatus.value;
+      if(!item.title) return alert('প্রজেক্টের নাম দিন');
+    }
+    
+    content.push(item);
+    await api(type, 'PUT', content, sha);
+    alert('সফলভাবে যোগ হয়েছে!');
+    loadAll();
+    document.querySelectorAll(`#${type} input, #${type} textarea`).forEach(el => el.value = '');
+  } catch(e) { alert('এরর: ' + e.message); }
+}
+
+async function deleteItem(type, index) {
+  if(!confirm('ডিলেট করবেন?')) return;
+  try {
+    const { content, sha } = await getFile(type);
+    content.splice(index, 1);
+    await api(type, 'PUT', content, sha);
+    alert('ডিলেট হয়েছে!');
+    loadAll();
+  } catch(e) { alert('এরর: ' + e.message); }
+}
+
+async function saveSettings() {
+  if(!TOKEN) return alert('আগে Token সেভ করুন');
+  try {
+    const { sha } = await getFile('settings');
+    let settings = {
+      name: sName.value, bkash: sBkash.value, nagad: sNagad.value, 
+      address: sAddress.value, logo: 'images/logo.png'
+    };
+    await api('settings', 'PUT', settings, sha);
+    alert('সেটিংস সেভ হয়েছে!');
+  } catch(e) { alert('এরর: ' + e.message); }
+}
+</script>
+
+</body>
+</html>
