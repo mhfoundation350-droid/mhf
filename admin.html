@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHF Admin Panel</title>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBxM3ARqJFrR-joDhEFCLR91UJPkovun-U",
+      authDomain: "mhf-foundation.firebaseapp.com",
+      projectId: "mhf-foundation",
+      storageBucket: "mhf-foundation.firebasestorage.app",
+      messagingSenderId: "935003103652",
+      appId: "1:935003103652:web:52e57da27fccf37c45e131"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    window.db = db;
+    window.auth = auth;
+    window.firestore = { doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, serverTimestamp };
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'SolaimanLipi', Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+   .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+   .header { background: linear-gradient(135deg, #1e40af, #059669); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; position: relative; }
+   .logout-btn { position: absolute; top: 15px; right: 15px; background: #dc2626; padding: 8px 15px; border: none; border-radius: 5px; color: white; cursor: pointer; font-size: 14px; }
+   .tabs { display: flex; flex-wrap: wrap; gap: 5px; padding: 15px; background: #f8f9fa; border-bottom: 2px solid #e9ecef; }
+   .tab { padding: 10px 15px; background: white; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; font-size: 14px; }
+   .tab.active { background: #1e40af; color: white; }
+   .content { padding: 20px; display: none; }
+   .content.active { display: block; }
+   .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+    textarea { min-height: 80px; resize: vertical; }
+   .btn { background: #1e40af; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; }
+   .btn:hover { background: #1e3a8a; }
+   .btn-delete { background: #dc2626; padding: 5px 10px; font-size: 12px; width: auto; margin-left: 10px; }
+   .item-list { margin-top: 20px; }
+   .item { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid #1e40af; }
+   .login { max-width: 400px; margin: 100px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    #adminPanel { display: none; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div id="loginForm" class="login">
+  <h2 style="text-align:center;margin-bottom:20px;">MHF Admin Login</h2>
+  <div class="form-group">
+    <label>ইমেইল:</label>
+    <input type="email" id="email" placeholder="admin@mhf.com">
+  </div>
+  <div class="form-group">
+    <label>পাসওয়ার্ড:</label>
+    <input type="password" id="password" placeholder="পাসওয়ার্ড দিন">
+  </div>
+  <button class="btn" onclick="login()">লগইন করুন</button>
+</div>
+
+<div id="adminPanel" class="container">
+  <div class="header">
+    <h1>মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+    <p>Admin Panel - সব ডাটা ম্যানেজ করুন</p>
+    <button class="logout-btn" onclick="logout()">লগআউট</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('about')">আমাদের সম্পর্কে</div>
+    <div class="tab" onclick="showTab('committee')">কমিটি</div>
+    <div class="tab" onclick="showTab('projects')">প্রজেক্ট</div>
+    <div class="tab" onclick="showTab('gallery')">গ্যালারি</div>
+    <div class="tab" onclick="showTab('report')">রিপোর্ট</div>
+    <div class="tab" onclick="showTab('donation')">ডোনেশন</div>
+    <div class="tab" onclick="showTab('contact')">যোগাযোগ</div>
+  </div>
+
+  <!-- About Tab -->
+  <div id="about" class="content active">
+    <h3>আমাদের সম্পর্কে সেটিংস</h3>
+    <div class="form-group">
+      <label>কে আমরা?</label>
+      <textarea id="aboutWho"></textarea>
+    </div>
+    <div class="form-group">
+      <label>আমাদের মিশন</label>
+      <textarea id="aboutMission"></textarea>
+    </div>
+    <div class="form-group">
+      <label>আমাদের ভিশন</label>
+      <textarea id="aboutVision"></textarea>
+    </div>
+    <div class="form-group">
+      <label>আমাদের টিম</label>
+      <textarea id="aboutTeam"></textarea>
+    </div>
+    <button class="btn" onclick="saveAbout()">Firebase এ সেভ করুন</button>
+  </div>
+
+  <!-- Committee Tab -->
+  <div id="committee" class="content">
+    <h3>কমিটি মেম্বার যোগ করুন</h3>
+    <div class="form-group"><label>নাম:</label><input type="text" id="comName"></div>
+    <div class="form-group"><label>পদবি:</label><input type="text" id="comPost"></div>
+    <div class="form-group"><label>ফোন:</label><input type="text" id="comPhone"></div>
+    <div class="form-group"><label>ছবির লিংক:</label><input type="text" id="comImage" placeholder="images/name.jpg"></div>
+    <button class="btn" onclick="addCommittee()">যোগ করুন</button>
+    <div id="committeeList" class="item-list"></div>
+  </div>
+
+  <!-- Projects Tab -->
+  <div id="projects" class="content">
+    <h3>প্রজেক্ট যোগ করুন</h3>
+    <div class="form-group"><label>প্রজেক্টের নাম:</label><input type="text" id="proName"></div>
+    <div class="form-group"><label>বিবরণ:</label><textarea id="proDesc"></textarea></div>
+    <div class="form-group"><label>স্ট্যাটাস:</label>
+      <select id="proStatus"><option value="চলমান">চলমান</option><option value="সম্পন্ন">সম্পন্ন</option></select>
+    </div>
+    <div class="form-group"><label>ছবির লিংক:</label><input type="text" id="proImage"></div>
+    <button class="btn" onclick="addProject()">যোগ করুন</button>
+    <div id="projectsList" class="item-list"></div>
+  </div>
+
+  <!-- Gallery Tab -->
+  <div id="gallery" class="content">
+    <h3>গ্যালারিতে ছবি যোগ করুন</h3>
+    <div class="form-group"><label>ছবির টাইটেল:</label><input type="text" id="galTitle"></div>
+    <div class="form-group"><label>ক্যাটাগরি:</label>
+      <select id="galCat"><option>মেডিকেল ক্যাম্প</option><option>শিক্ষা সহায়তা</option><option>ত্রাণ বিতরণ</option><option>অন্যান্য</option></select>
+    </div>
+    <div class="form-group"><label>ছবির লিংক:</label><input type="text" id="galImage"></div>
+    <button class="btn" onclick="addGallery()">যোগ করুন</button>
+    <div id="galleryList" class="item-list"></div>
+  </div>
+
+  <!-- Report Tab -->
+  <div id="report" class="content">
+    <h3>রিপোর্ট যোগ করুন</h3>
+    <div class="form-group"><label>রিপোর্টের নাম:</label><input type="text" id="repName"></div>
+    <div class="form-group"><label>তারিখ:</label><input type="date" id="repDate"></div>
+    <div class="form-group"><label>PDF লিংক:</label><input type="text" id="repLink" placeholder="reports/file.pdf"></div>
+    <button class="btn" onclick="addReport()">যোগ করুন</button>
+    <div id="reportList" class="item-list"></div>
+  </div>
+
+  <!-- Donation Tab -->
+  <div id="donation" class="content">
+    <h3>ডোনেশন সেটিংস</h3>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>বিকাশ নাম্বার:</label>
+        <input type="text" id="donBkash" placeholder="01XXXXXXXXX">
+      </div>
+      <div class="form-group">
+        <label>বিকাশ QR Code লিংক:</label>
+        <input type="text" id="donBkashQR" placeholder="images/bkash-qr.png">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>নগদ নাম্বার:</label>
+        <input type="text" id="donNagad" placeholder="01XXXXXXXXX">
+      </div>
+      <div class="form-group">
+        <label>নগদ QR Code লিংক:</label>
+        <input type="text" id="donNagadQR" placeholder="images/nagad-qr.png">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>রকেট নাম্বার:</label>
+        <input type="text" id="donRocket" placeholder="01XXXXXXXXX">
+      </div>
+      <div class="form-group">
+        <label>রকেট QR Code লিংক:</label>
+        <input type="text" id="donRocketQR" placeholder="images/rocket-qr.png">
+      </div>
+    </div>
+    <hr style="margin: 20px 0;">
+    <h4 style="margin-bottom: 15px;">ব্যাংক অ্যাকাউন্ট তথ্য</h4>
+    <div class="form-group">
+      <label>ব্যাংকের নাম:</label>
+      <input type="text" id="donBankName" placeholder="Dutch Bangla Bank">
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>অ্যাকাউন্ট নাম্বার:</label>
+        <input type="text" id="donBankAcc" placeholder="1234567890">
+      </div>
+      <div class="form-group">
+        <label>ব্রাঞ্চ:</label>
+        <input type="text" id="donBankBranch" placeholder="কমলনগর ব্রাঞ্চ">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>অ্যাকাউন্ট নাম:</label>
+      <input type="text" id="donBankHolder" placeholder="Meghna Humanity Foundation">
+    </div>
+    <button class="btn" onclick="saveDonation()">Firebase এ সেভ করুন</button>
+  </div>
+
+  <!-- Contact Tab -->
+  <div id="contact" class="content">
+    <h3>যোগাযোগ তথ্য</h3>
+    <div class="form-group"><label>ঠিকানা:</label><input type="text" id="conAddress"></div>
+    <div class="form-group"><label>বিকাশ:</label><input type="text" id="conBkash"></div>
+    <div class="form-group"><label>নগদ:</label><input type="text" id="conNagad"></div>
+    <div class="form-group"><label>ইমেইল:</label><input type="text" id="conEmail"></div>
+    <div class="form-group"><label>Facebook Page লিংক:</label><input type="text" id="conFacebook"></div>
+    <button class="btn" onclick="saveContact()">Firebase এ সেভ করুন</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+const auth = window.auth;
+
+window.login = async () => {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(error) {
+    alert('লগইন ফেইল: ' + error.message);
+  }
+}
+
+window.logout = async () => {
+  await signOut(auth);
+}
+
+// Auto check login state
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    await loadAllData();
+  } else {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+  }
+});
+
+window.showTab = (tabName) => {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(tabName).classList.add('active');
+}
+
+async function loadAllData() {
+  const { doc, getDoc } = window.firestore;
+  const db = window.db;
+  
+  try {
+    const aboutSnap = await getDoc(doc(db, "settings", "about"));
+    if(aboutSnap.exists()) {
+      let d = aboutSnap.data();
+      document.getElementById('aboutWho').value = d.who || '';
+      document.getElementById('aboutMission').value = d.mission || '';
+      document.getElementById('aboutVision').value = d.vision || '';
+      document.getElementById('aboutTeam').value = d.team || '';
+    }
+    
+    const contactSnap = await getDoc(doc(db, "settings", "contact"));
+    if(contactSnap.exists()) {
+      let d = contactSnap.data();
+      document.getElementById('conAddress').value = d.address || '';
+      document.getElementById('conBkash').value = d.bkash || '';
+      document.getElementById('conNagad').value = d.nagad || '';
+      document.getElementById('conEmail').value = d.email || '';
+      document.getElementById('conFacebook').value = d.fb || d.facebook || '';
+    }
+
+    const donationSnap = await getDoc(doc(db, "settings", "donation"));
+    if(donationSnap.exists()) {
+      let d = donationSnap.data();
+      document.getElementById('donBkash').value = d.bkash || '';
+      document.getElementById('donBkashQR').value = d.bkashQR || '';
+      document.getElementById('donNagad').value = d.nagad || '';
+      document.getElementById('donNagadQR').value = d.nagadQR || '';
+      document.getElementById('donRocket').value = d.rocket || '';
+      document.getElementById('donRocketQR').value = d.rocketQR || '';
+      document.getElementById('donBankName').value = d.bank_name || '';
+      document.getElementById('donBankAcc').value = d.bank_acc || '';
+      document.getElementById('donBankBranch').value = d.bank_branch || '';
+      document.getElementById('donBankHolder').value = d.bank_holder || '';
+    }
+  } catch(e) { console.error('Load Error:', e); }
+  
+  loadCommittee(); loadProjects(); loadGallery(); loadReport();
+}
+
+window.saveAbout = async () => {
+  const { doc, setDoc } = window.firestore;
+  try {
+    await setDoc(doc(window.db, "settings", "about"), {
+      who: document.getElementById('aboutWho').value,
+      mission: document.getElementById('aboutMission').value,
+      vision: document.getElementById('aboutVision').value,
+      team: document.getElementById('aboutTeam').value
+    });
+    alert('Firebase এ সেভ হয়েছে! ✅');
+  } catch(e) { 
+    console.error('Error:', e);
+    alert('Error: ' + e.message);
+  }
+}
+
+window.saveContact = async () => {
+  const { doc, setDoc } = window.firestore;
+  try {
+    await setDoc(doc(window.db, "settings", "contact"), {
+      address: document.getElementById('conAddress').value,
+      bkash: document.getElementById('conBkash').value,
+      nagad: document.getElementById('conNagad').value,
+      email: document.getElementById('conEmail').value,
+      fb: document.getElementById('conFacebook').value
+    });
+    alert('Firebase এ সেভ হয়েছে! ✅');
+  } catch(e) { 
+    console.error('Error:', e);
+    alert('Error: ' + e.message);
+  }
+}
+
+window.saveDonation = async () => {
+  const { doc, setDoc } = window.firestore;
+  try {
+    await setDoc(doc(window.db, "settings", "donation"), {
+      bkash: document.getElementById('donBkash').value,
+      bkashQR: document.getElementById('donBkashQR').value,
+      nagad: document.getElementById('donNagad').value,
+      nagadQR: document.getElementById('donNagadQR').value,
+      rocket: document.getElementById('donRocket').value,
+      rocketQR: document.getElementById('donRocketQR').value,
+      bank_name: document.getElementById('donBankName').value,
+      bank_acc: document.getElementById('donBankAcc').value,
+      bank_branch: document.getElementById('donBankBranch').value,
+      bank_holder: document.getElementById('donBankHolder').value
+    });
+    alert('ডোনেশন তথ্য সেভ হয়েছে! ✅');
+  } catch(e) { 
+    console.error('Error:', e);
+    alert('Error: ' + e.message);
+  }
+}
+
+window.addCommittee = async () => {
+  const { collection, addDoc, serverTimestamp } = window.firestore;
+  try {
+    await addDoc(collection(window.db, "committee"), {
+      name: document.getElementById('comName').value,
+      post: document.getElementById('comPost').value,
+      phone: document.getElementById('comPhone').value,
+      image: document.getElementById('comImage').value,
+      timestamp: serverTimestamp()
+    });
+    loadCommittee();
+    document.getElementById('comName').value = '';
+    document.getElementById('comPost').value = '';
+    document.getElementById('comPhone').value = '';
+    document.getElementById('comImage').value = '';
+    alert('যোগ হয়েছে! ✅');
+  } catch(e) { 
+    console.error('Error:', e);
+    alert('Error: ' + e.message);
+  }
+}
+
+async function loadCommittee() {
+  const { collection, getDocs } = window.firestore;
+  try {
+    const snap = await getDocs(collection(window.db, "committee"));
+    let html = '';
+    snap.forEach(d => {
+      let item = d.data();
+      html += `<div class="item"><b>${item.name}</b> - ${item.post} <button class="btn btn-delete" onclick="deleteItem('committee','${d.id}')">ডিলিট</button></div>`;
+    });
+    document.getElementById('committeeList').innerHTML = html;
+  } catch(e) { console.error(e); }
+}
+
+window.addProject = async () => {
+  const { collection, addDoc, serverTimestamp } = window.firestore;
+  try {
+    await addDoc(collection(window.db, "projects"), {
+      name: document.getElementById('proName').value,
+      desc: document.getElementById('proDesc').value,
+      status: document.getElementById('proStatus').value,
+      image: document.getElementById('proImage').value,
+      timestamp: serverTimestamp()
+    });
+    loadProjects();
+    document.getElementById('proName').value = '';
+    document.getElementById('proDesc').value = '';
+    document.getElementById('proImage').value = '';
+    alert('যোগ হয়েছে! ✅');
+  } catch(e) { 
+    console.error('Error:', e);
+    alert('Error: ' + e.message);
+  }
+}
+
+async function loadProjects() {
+  const { collection, getDocs } = window.firestore;
+  try {
+    const snap = await getDocs(collection(window.db, "projects"));
+    let html = '';
+    snap.forEach(d => {
+      let item = d.data();
+      html += `<div class="item"><b>${item.name}</b> - ${item.status} <button class="btn btn-delete" onclick="deleteItem('projects','${d.id}')">ডিলিট</button></div>`;
+    });
+    document.getElementById('projectsList').innerHTML = html;
+  } catch(e) { console.error(e); }
+}
+
+window.addGallery = async () => {
+  const { collection, addDoc, serverTimestamp } = window.firestore;
+  try {
+    await addDoc(collection(window.db, "gallery"), {
+      title: document.getElementById('galTitle').value,
+      cat: document.getElementById('galCat').value,
+      image: document.getElementById('galImage').value,
+      timestamp: serverTimestamp()
+    });
+    loadGallery();
+    document.getElementById('galTitle').value = '';
+    document.getElementById('galImage').value = '';
+    alert('যোগ হয়েছে! ✅');
+  } catch(e) { 
+    console.error('Error:', e);
+    alert('Error: ' + e.message);
+  }
+}
+
+async function loadGallery() {
+  const { collection, getDocs } = window.firestore;
+  try {
+    const snap = await getDocs(collection(window.db, "gallery"));
+    let html = '';
+    snap.forEach(d => {
+      let item = d.data();
+      html += `<div class="item"><b>${item.title}</b> - ${item.cat} <button class="btn btn-delete" onclick="deleteItem('gallery','${d.id}')">ডিলিট</button></div>`;
+    });
+    document.getElementById('galleryList').innerHTML = html;
+  } catch(e) { console.error(e); }
+}
+
+window.addReport = async () => {
+  const { collection, addDoc, serverTimestamp } = window.firestore;
+  try {
+    await addDoc(collection(window.db, "report"), {
+      name: document.getElementById('repName').value,
+      date: document.getElementById('repDate').value,
+      link: document.getElementById('repLink').value,
+      timestamp: serverTimestamp()
+    });
+    loadReport();
+    document.getElementById('repName').value = '';
+    document.getElementById('repDate').value = '';
+    document.getElementById('repLink').value = '';
+    alert('যোগ হয়েছে! ✅');
+  } catch(e) { 
+    console.error('Error:', e);
+    alert('Error: ' + e.message);
+  }
+}
+
+async function loadReport() {
+  const { collection, getDocs } = window.firestore;
+  try {
+    const snap = await getDocs(collection(window.db, "report"));
+    let html = '';
+    snap.forEach(d => {
+      let item = d.data();
+      html += `<div class="item"><b>${item.name}</b> - ${item.date} <button class="btn btn-delete" onclick="deleteItem('report','${d.id}')">ডিলিট</button></div>`;
+    });
+    document.getElementById('reportList').innerHTML = html;
+  } catch(e) { console.error(e); }
+}
+
+window.deleteItem = async (col, id) => {
+  const { doc, deleteDoc } = window.firestore;
+  try {
+    await deleteDoc(doc(window.db, col, id));
+    if(col === 'committee') loadCommittee();
+    if(col === 'projects') loadProjects();
+    if(col === 'gallery') loadGallery();
+    if(col === 'report') loadReport();
+    alert('ডিলিট হয়েছে! ✅');
+  } catch(e) { 
+    console.error('Error:', e);
+    alert('Error: ' + e.message);
+  }
+}
+</script>
+
+</body>
+</html>
