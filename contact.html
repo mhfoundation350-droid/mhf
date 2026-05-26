@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>যোগাযোগ - মেঘনা হিউম্যানিটি ফাউন্ডেশন</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap');
+    body { font-family: 'Noto Sans Bengali', sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #166534 0%, #15803d 100%); }
+    .card { background: white; border-radius: 1rem; padding: 2rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+    .nav-link { padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s; }
+    .nav-link:hover { background: rgba(255,255,255,0.2); }
+    .nav-link.active { background: rgba(255,255,255,0.3); font-weight: bold; }
+    .btn-primary { background: #2563eb; color: white; padding: 0.75rem 2rem; border-radius: 0.5rem; font-weight: bold; transition: all 0.3s; }
+    .btn-primary:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="gradient-bg text-white p-4 sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold" id="siteName">MHF</h1>
+      <div class="space-x-2">
+        <a href="index.html" class="nav-link">হোম</a>
+        <a href="about.html" class="nav-link">আমাদের সম্পর্কে</a>
+        <a href="projects.html" class="nav-link">প্রজেক্ট</a>
+        <a href="report.html" class="nav-link">রিপোর্ট</a>
+        <a href="gallery.html" class="nav-link">গ্যালারি</a>
+        <a href="contact.html" class="nav-link active">যোগাযোগ</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <div class="gradient-bg text-white py-16 text-center">
+    <h2 class="text-5xl font-bold">যোগাযোগ করুন</h2>
+    <p class="text-xl mt-4 opacity-90">আপনার যে কোনো প্রশ্ন বা সহযোগিতার জন্য আমরা প্রস্তুত</p>
+  </div>
+
+  <div class="container mx-auto px-4 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <!-- Contact Info -->
+      <div class="card">
+        <h3 class="text-3xl font-bold text-green-900 mb-6">আমাদের ঠিকানা</h3>
+        
+        <div class="space-y-6">
+          <div class="flex items-start gap-4">
+            <div class="bg-blue-100 p-3 rounded-full">
+              <svg class="w-6 h-6 text-blue-700" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+            </div>
+            <div>
+              <p class="font-bold text-lg">ঠিকানা</p>
+              <p class="text-gray-700" id="addressText">লোড হচ্ছে...</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="bg-green-100 p-3 rounded-full">
+              <svg class="w-6 h-6 text-green-700" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+            </div>
+            <div>
+              <p class="font-bold text-lg">বিকাশ</p>
+              <p class="text-gray-700 text-xl" id="bkashText">-</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="bg-orange-100 p-3 rounded-full">
+              <svg class="w-6 h-6 text-orange-700" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+            </div>
+            <div>
+              <p class="font-bold text-lg">নগদ</p>
+              <p class="text-gray-700 text-xl" id="nagadText">-</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="bg-purple-100 p-3 rounded-full">
+              <svg class="w-6 h-6 text-purple-700" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+            </div>
+            <div>
+              <p class="font-bold text-lg">ইমেইল</p>
+              <p class="text-gray-700" id="emailText">-</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <a href="#" id="facebookLink" target="_blank" class="btn-primary inline-block">Facebook Page</a>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="card">
+        <h3 class="text-3xl font-bold text-green-900 mb-6">মেসেজ পাঠান</h3>
+        <form id="contactForm" class="space-y-4">
+          <div>
+            <label class="block font-bold mb-2">আপনার নাম</label>
+            <input type="text" id="name" required class="w-full border-2 p-3 rounded-lg focus:border-green-600 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold mb-2">মোবাইল নম্বর</label>
+            <input type="tel" id="phone" required class="w-full border-2 p-3 rounded-lg focus:border-green-600 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold mb-2">বিষয়</label>
+            <input type="text" id="subject" required class="w-full border-2 p-3 rounded-lg focus:border-green-600 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold mb-2">মেসেজ</label>
+            <textarea id="message" rows="5" required class="w-full border-2 p-3 rounded-lg focus:border-green-600 outline-none"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-green-700 text-white py-3 rounded-lg font-bold hover:bg-green-800 transition">মেসেজ পাঠান</button>
+          <p id="formStatus" class="text-center font-semibold"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBxM3ARqJFrR-joDhEFCLR91UJPkovun-U",
+  authDomain: "mhf-foundation.firebaseapp.com",
+  projectId: "mhf-foundation",
+  storageBucket: "mhf-foundation.firebasestorage.app",
+  messagingSenderId: "935003103652",
+  appId: "1:935003103652:web:6bd9c4692553cd8c45e131"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Contact Info লোড করো Firestore থেকে
+async function loadContactInfo() {
+  try {
+    const docRef = doc(db, "settings", "contact");
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      document.getElementById('addressText').textContent = data.address || 'কমলনগর, লক্ষ্মীপুর জেলা';
+      document.getElementById('bkashText').textContent = data.bkash || '-';
+      document.getElementById('nagadText').textContent = data.nagad || '-';
+      document.getElementById('emailText').textContent = data.email || '-';
+      document.getElementById('facebookLink').href = data.fb || '#';
+    }
+  } catch (error) {
+    console.log("Contact Info লোড Error:", error);
+  }
+}
+
+// Contact Form সাবমিট
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formStatus = document.getElementById('formStatus');
+  formStatus.textContent = 'পাঠানো হচ্ছে...';
+  formStatus.className = 'text-center font-semibold text-blue-600';
+
+  try {
+    await addDoc(collection(db, "messages"), {
+      name: document.getElementById('name').value,
+      phone: document.getElementById('phone').value,
+      subject: document.getElementById('subject').value,
+      message: document.getElementById('message').value,
+      timestamp: serverTimestamp()
+    });
+    
+    formStatus.textContent = 'মেসেজ সফলভাবে পাঠানো হয়েছে! ❤️';
+    formStatus.className = 'text-center font-semibold text-green-600';
+    document.getElementById('contactForm').reset();
+  } catch (error) {
+    formStatus.textContent = 'দুঃখিত, মেসেজ পাঠানো যায়নি। আবার চেষ্টা করুন।';
+    formStatus.className = 'text-center font-semibold text-red-600';
+    console.log("Message Error:", error);
+  }
+});
+
+loadContactInfo();
+</script>
+</body>
+</html>
