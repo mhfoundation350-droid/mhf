@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHF Admin Panel</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'SolaimanLipi', Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+   .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+   .header { background: linear-gradient(135deg, #1e40af, #059669); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+   .tabs { display: flex; flex-wrap: wrap; gap: 5px; padding: 15px; background: #f8f9fa; border-bottom: 2px solid #e9ecef; }
+   .tab { padding: 10px 15px; background: white; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; font-size: 14px; }
+   .tab.active { background: #1e40af; color: white; }
+   .content { padding: 20px; display: none; }
+   .content.active { display: block; }
+   .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+    textarea { min-height: 80px; resize: vertical; }
+   .btn { background: #1e40af; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; }
+   .btn:hover { background: #1e3a8a; }
+   .btn-delete { background: #dc2626; padding: 5px 10px; font-size: 12px; width: auto; margin-left: 10px; }
+   .item-list { margin-top: 20px; }
+   .item { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid #1e40af; }
+   .login { max-width: 400px; margin: 100px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    #adminPanel { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="loginForm" class="login">
+  <h2 style="text-align:center;margin-bottom:20px;">MHF Admin Login</h2>
+  <div class="form-group">
+    <label>পাসওয়ার্ড:</label>
+    <input type="password" id="password" placeholder="পাসওয়ার্ড দিন">
+  </div>
+  <button class="btn" onclick="login()">লগইন করুন</button>
+</div>
+
+<div id="adminPanel" class="container">
+  <div class="header">
+    <h1>মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+    <p>Admin Panel - সব ডাটা ম্যানেজ করুন</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('about')">আমাদের সম্পর্কে</div>
+    <div class="tab" onclick="showTab('committee')">কমিটি</div>
+    <div class="tab" onclick="showTab('projects')">প্রজেক্ট</div>
+    <div class="tab" onclick="showTab('gallery')">গ্যালারি</div>
+    <div class="tab" onclick="showTab('report')">রিপোর্ট</div>
+    <div class="tab" onclick="showTab('contact')">যোগাযোগ</div>
+  </div>
+
+  <!-- About Tab -->
+  <div id="about" class="content active">
+    <h3>আমাদের সম্পর্কে সেটিংস</h3>
+    <div class="form-group">
+      <label>কে আমরা?</label>
+      <textarea id="aboutWho"></textarea>
+    </div>
+    <div class="form-group">
+      <label>আমাদের মিশন</label>
+      <textarea id="aboutMission"></textarea>
+    </div>
+    <div class="form-group">
+      <label>আমাদের ভিশন</label>
+      <textarea id="aboutVision"></textarea>
+    </div>
+    <div class="form-group">
+      <label>আমাদের টিম</label>
+      <textarea id="aboutTeam"></textarea>
+    </div>
+    <button class="btn" onclick="saveAbout()">সেভ করুন</button>
+  </div>
+
+  <!-- Committee Tab -->
+  <div id="committee" class="content">
+    <h3>কমিটি মেম্বার যোগ করুন</h3>
+    <div class="form-group"><label>নাম:</label><input type="text" id="comName"></div>
+    <div class="form-group"><label>পদবি:</label><input type="text" id="comPost"></div>
+    <div class="form-group"><label>ফোন:</label><input type="text" id="comPhone"></div>
+    <div class="form-group"><label>ছবির লিংক:</label><input type="text" id="comImage" placeholder="images/name.jpg"></div>
+    <button class="btn" onclick="addCommittee()">যোগ করুন</button>
+    <div id="committeeList" class="item-list"></div>
+  </div>
+
+  <!-- Projects Tab -->
+  <div id="projects" class="content">
+    <h3>প্রজেক্ট যোগ করুন</h3>
+    <div class="form-group"><label>প্রজেক্টের নাম:</label><input type="text" id="proName"></div>
+    <div class="form-group"><label>বিবরণ:</label><textarea id="proDesc"></textarea></div>
+    <div class="form-group"><label>স্ট্যাটাস:</label>
+      <select id="proStatus"><option value="চলমান">চলমান</option><option value="সম্পন্ন">সম্পন্ন</option></select>
+    </div>
+    <div class="form-group"><label>ছবির লিংক:</label><input type="text" id="proImage"></div>
+    <button class="btn" onclick="addProject()">যোগ করুন</button>
+    <div id="projectsList" class="item-list"></div>
+  </div>
+
+  <!-- Gallery Tab -->
+  <div id="gallery" class="content">
+    <h3>গ্যালারিতে ছবি যোগ করুন</h3>
+    <div class="form-group"><label>ছবির টাইটেল:</label><input type="text" id="galTitle"></div>
+    <div class="form-group"><label>ক্যাটাগরি:</label>
+      <select id="galCat"><option>মেডিকেল ক্যাম্প</option><option>শিক্ষা সহায়তা</option><option>ত্রাণ বিতরণ</option><option>অন্যান্য</option></select>
+    </div>
+    <div class="form-group"><label>ছবির লিংক:</label><input type="text" id="galImage"></div>
+    <button class="btn" onclick="addGallery()">যোগ করুন</button>
+    <div id="galleryList" class="item-list"></div>
+  </div>
+
+  <!-- Report Tab -->
+  <div id="report" class="content">
+    <h3>রিপোর্ট যোগ করুন</h3>
+    <div class="form-group"><label>রিপোর্টের নাম:</label><input type="text" id="repName"></div>
+    <div class="form-group"><label>তারিখ:</label><input type="date" id="repDate"></div>
+    <div class="form-group"><label>PDF লিংক:</label><input type="text" id="repLink" placeholder="reports/file.pdf"></div>
+    <button class="btn" onclick="addReport()">যোগ করুন</button>
+    <div id="reportList" class="item-list"></div>
+  </div>
+
+  <!-- Contact Tab -->
+  <div id="contact" class="content">
+    <h3>যোগাযোগ তথ্য</h3>
+    <div class="form-group"><label>ঠিকানা:</label><input type="text" id="conAddress"></div>
+    <div class="form-group"><label>বিকাশ:</label><input type="text" id="conBkash"></div>
+    <div class="form-group"><label>নগদ:</label><input type="text" id="conNagad"></div>
+    <div class="form-group"><label>ইমেইল:</label><input type="text" id="conEmail"></div>
+    <div class="form-group"><label>Facebook Page লিংক:</label><input type="text" id="conFacebook"></div>
+    <button class="btn" onclick="saveContact()">সেভ করুন</button>
+  </div>
+
+</div>
+
+<script>
+const PASS = "admin123"; // এই পাসওয়ার্ড চেঞ্জ করে নিও
+
+function login() {
+  if(document.getElementById('password').value === PASS) {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadAllData();
+  } else {
+    alert('ভুল পাসওয়ার্ড!');
+  }
+}
+
+function showTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(tabName).classList.add('active');
+}
+
+function getData() {
+  return JSON.parse(localStorage.getItem('mhfData') || '{}');
+}
+
+function saveData(data) {
+  localStorage.setItem('mhfData', JSON.stringify(data));
+  alert('সেভ হয়েছে! ওয়েবসাইট রিফ্রেশ করুন।');
+}
+
+function loadAllData() {
+  let data = getData();
+  // About
+  if(data.about) {
+    document.getElementById('aboutWho').value = data.about.who || '';
+    document.getElementById('aboutMission').value = data.about.mission || '';
+    document.getElementById('aboutVision').value = data.about.vision || '';
+    document.getElementById('aboutTeam').value = data.about.team || '';
+  }
+  // Contact
+  if(data.contact) {
+    document.getElementById('conAddress').value = data.contact.address || '';
+    document.getElementById('conBkash').value = data.contact.bkash || '';
+    document.getElementById('conNagad').value = data.contact.nagad || '';
+    document.getElementById('conEmail').value = data.contact.email || '';
+    document.getElementById('conFacebook').value = data.contact.facebook || '';
+  }
+  loadCommittee(); loadProjects(); loadGallery(); loadReport();
+}
+
+function saveAbout() {
+  let data = getData();
+  data.about = {
+    who: document.getElementById('aboutWho').value,
+    mission: document.getElementById('aboutMission').value,
+    vision: document.getElementById('aboutVision').value,
+    team: document.getElementById('aboutTeam').value
+  };
+  saveData(data);
+}
+
+function saveContact() {
+  let data = getData();
+  data.contact = {
+    address: document.getElementById('conAddress').value,
+    bkash: document.getElementById('conBkash').value,
+    nagad: document.getElementById('conNagad').value,
+    email: document.getElementById('conEmail').value,
+    facebook: document.getElementById('conFacebook').value
+  };
+  saveData(data);
+}
+
+function addCommittee() {
+  let data = getData();
+  data.committee = data.committee || [];
+  data.committee.push({
+    name: document.getElementById('comName').value,
+    post: document.getElementById('comPost').value,
+    phone: document.getElementById('comPhone').value,
+    image: document.getElementById('comImage').value
+  });
+  saveData(data);
+  loadCommittee();
+  document.getElementById('comName').value = '';
+  document.getElementById('comPost').value = '';
+  document.getElementById('comPhone').value = '';
+  document.getElementById('comImage').value = '';
+}
+
+function loadCommittee() {
+  let data = getData();
+  let html = '';
+  (data.committee || []).forEach((item, i) => {
+    html += `<div class="item"><b>${item.name}</b> - ${item.post} <button class="btn btn-delete" onclick="deleteItem('committee',${i})">ডিলিট</button></div>`;
+  });
+  document.getElementById('committeeList').innerHTML = html;
+}
+
+function addProject() {
+  let data = getData();
+  data.projects = data.projects || [];
+  data.projects.push({
+    name: document.getElementById('proName').value,
+    desc: document.getElementById('proDesc').value,
+    status: document.getElementById('proStatus').value,
+    image: document.getElementById('proImage').value
+  });
+  saveData(data); loadProjects();
+}
+
+function loadProjects() {
+  let data = getData();
+  let html = '';
+  (data.projects || []).forEach((item, i) => {
+    html += `<div class="item"><b>${item.name}</b> - ${item.status} <button class="btn btn-delete" onclick="deleteItem('projects',${i})">ডিলিট</button></div>`;
+  });
+  document.getElementById('projectsList').innerHTML = html;
+}
+
+function addGallery() {
+  let data = getData();
+  data.gallery = data.gallery || [];
+  data.gallery.push({
+    title: document.getElementById('galTitle').value,
+    cat: document.getElementById('galCat').value,
+    image: document.getElementById('galImage').value
+  });
+  saveData(data); loadGallery();
+}
+
+function loadGallery() {
+  let data = getData();
+  let html = '';
+  (data.gallery || []).forEach((item, i) => {
+    html += `<div class="item"><b>${item.title}</b> - ${item.cat} <button class="btn btn-delete" onclick="deleteItem('gallery',${i})">ডিলিট</button></div>`;
+  });
+  document.getElementById('galleryList').innerHTML = html;
+}
+
+function addReport() {
+  let data = getData();
+  data.report = data.report || [];
+  data.report.push({
+    name: document.getElementById('repName').value,
+    date: document.getElementById('repDate').value,
+    link: document.getElementById('repLink').value
+  });
+  saveData(data); loadReport();
+}
+
+function loadReport() {
+  let data = getData();
+  let html = '';
+  (data.report || []).forEach((item, i) => {
+    html += `<div class="item"><b>${item.name}</b> - ${item.date} <button class="btn btn-delete" onclick="deleteItem('report',${i})">ডিলিট</button></div>`;
+  });
+  document.getElementById('reportList').innerHTML = html;
+}
+
+function deleteItem(type, index) {
+  let data = getData();
+  data[type].splice(index, 1);
+  saveData(data);
+  loadAllData();
+}
+</script>
+
+</body>
+</html>
