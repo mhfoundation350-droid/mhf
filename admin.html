@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - MHF Foundation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Noto Sans Bengali',sans-serif}
+        body{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px}
+  .login-box{max-width:400px;margin:100px auto;background:#fff;padding:40px;border-radius:15px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+  .login-box h2{text-align:center;color:#1e40af;margin-bottom:30px}
+  .form-group{margin-bottom:20px}
+  .form-group label{display:block;margin-bottom:8px;font-weight:600;color:#334155}
+  .form-group input,.form-group textarea,.form-group select{width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px}
+  .form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:#1e40af}
+  .btn{background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;padding:12px 30px;border:none;border-radius:8px;cursor:pointer;font-weight:600;width:100%;font-size:16px}
+  .btn:hover{opacity:.9}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-delete{background:#dc2626;padding:8px 15px;font-size:14px;width:auto}
+  .btn-edit{background:#059669;padding:8px 15px;font-size:14px;width:auto;margin-right:5px}
+  .btn-edit:hover{background:#047857}
+  .dashboard{display:none;max-width:1200px;margin:0 auto}
+  .header{background:#fff;padding:20px;border-radius:15px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+  .header h1{color:#1e40af}
+  .tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{background:#fff;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:600;color:#64748b;transition:all.3s}
+  .tab.active{background:#1e40af;color:#fff}
+  .content{display:none;background:#fff;padding:30px;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+  .content.active{display:block}
+  .content h3{color:#1e40af;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #e2e8f0}
+  .item-list{margin-top:20px}
+  .item{background:#f8fafc;padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+  .item-info{flex:1}
+  .success-msg{background:#10b981;color:#fff;padding:12px;border-radius:8px;margin-bottom:15px;display:none}
+  .error-msg{background:#ef4444;color:#fff;padding:12px;border-radius:8px;margin-bottom:15px;display:none}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+  .mb-6{margin-bottom:24px}
+  .serial-badge{background:linear-gradient(135deg,#1e3a8a 0%,#059669 100%);color:white;width:35px;height:35px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-right:10px;flex-shrink:0}
+        @media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginBox" class="login-box">
+    <h2><i class="fas fa-lock"></i> Admin Login</h2>
+    <div id="loginError" class="error-msg"></div>
+    <div class="form-group">
+        <label>Email:</label>
+        <input type="email" id="email" placeholder="admin@mhf.com">
+    </div>
+    <div class="form-group">
+        <label>Password:</label>
+        <input type="password" id="password" placeholder="Enter password">
+    </div>
+    <button class="btn" onclick="login()">Login</button>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="dashboard">
+    <div class="header">
+        <h1><i class="fas fa-tachometer-alt"></i> MHF Admin Panel</h1>
+        <button class="btn btn-delete" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('donation')">Donation</div>
+        <div class="tab" onclick="showTab('contact')">Contact</div>
+        <div class="tab" onclick="showTab('committee')">Committee</div>
+        <div class="tab" onclick="showTab('fund')">Fund</div>
+        <div class="tab" onclick="showTab('gallery')">Gallery</div>
+        <div class="tab" onclick="showTab('projects')">Projects</div>
+        <div class="tab" onclick="showTab('about')">About</div>
+    </div>
+
+    <!-- Donation Tab -->
+    <div id="donation" class="content active">
+        <h3>ডোনেশন সেটিংস</h3>
+        <div id="donSuccess" class="success-msg">সফলভাবে আপডেট হয়েছে!</div>
+        <div id="donError" class="error-msg"></div>
+        <div class="grid-2">
+            <div class="form-group"><label>বিকাশ:</label><input type="text" id="bkash" placeholder="01XXXXXXXXX"></div>
+            <div class="form-group"><label>নগদ:</label><input type="text" id="nagad" placeholder="01XXXXXXXXX"></div>
+        </div>
+        <div class="form-group"><label>রকেট:</label><input type="text" id="rocket" placeholder="01XXXXXXXXX"></div>
+        <hr style="margin: 20px 0;">
+        <h4 style="margin-bottom: 15px;">ব্যাংক অ্যাকাউন্ট তথ্য</h4>
+        <div class="form-group"><label>ব্যাংকের নাম:</label><input type="text" id="bank_name" placeholder="Dutch Bangla Bank"></div>
+        <div class="grid-2">
+            <div class="form-group"><label>অ্যাকাউন্ট নম্বর:</label><input type="text" id="bank_account" placeholder="1234567890"></div>
+            <div class="form-group"><label>ব্রাঞ্চ:</label><input type="text" id="bank_branch" placeholder="কমলনগর ব্রাঞ্চ"></div>
+        </div>
+        <div class="form-group"><label>অ্যাকাউন্ট নাম:</label><input type="text" id="bank_holder" placeholder="Meghna Humanity Foundation"></div>
+        <div class="form-group"><label>Swift Code:</label><input type="text" id="bank_swift" placeholder="SWIFT Code"></div>
+        <button class="btn" onclick="saveDonation()">Firebase এ সেভ করুন</button>
+    </div>
+    <!-- Contact Tab -->
+    <div id="contact" class="content">
+        <h3>যোগাযোগ তথ্য</h3>
+        <div id="conSuccess" class="success-msg">সফলভাবে আপডেট হয়েছে!</div>
+        <div id="conError" class="error-msg"></div>
+        <div class="form-group"><label>ঠিকানা:</label><input type="text" id="address"></div>
+        <div class="form-group"><label>অফিস কতৃপক্ষ:</label><input type="text" id="officeAuthority" placeholder="যেমন: মোঃ করিম, সভাপতি"></div>
+        <div class="form-group"><label>WhatsApp নাম্বার:</label><input type="text" id="whatsapp" placeholder="8801XXXXXXXXX"></div>
+        <div class="form-group"><label>ইমেইল:</label><input type="text" id="conEmail"></div>
+        <div class="form-group"><label>Facebook URL:</label><input type="text" id="fb"></div>
+        <div class="form-group"><label>YouTube URL:</label><input type="text" id="yt"></div>
+        <button class="btn" onclick="saveContact()">Firebase এ সেভ করুন</button>
+    </div>
+    <!-- Committee Tab -->
+    <div id="committee" class="content">
+        <h3>কমিটি মেম্বার যোগ/এডিট করুন</h3>
+        <div id="comSuccess" class="success-msg">সফলভাবে সেভ হয়েছে!</div>
+        <div id="comError" class="error-msg"></div>
+
+        <form id="committeeForm" onsubmit="event.preventDefault(); submitCommitteeForm();">
+            <input type="hidden" id="editDocId">
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>ক্রম নং:</label>
+                    <input type="number" id="comSerial" placeholder="1" required>
+                </div>
+                <div class="form-group">
+                    <label>নাম:</label>
+                    <input type="text" id="comName" placeholder="মোঃ রাকিব" required>
+                </div>
+                <div class="form-group">
+                    <label>পদবি:</label>
+                    <input type="text" id="comPost" placeholder="সদস্য" required>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>মোবাইল:</label>
+                    <input type="text" id="comPhone" placeholder="01XXXXXXXXX" required>
+                </div>
+                <div class="form-group">
+                    <label>রক্তের গ্রুপ:</label>
+                    <select id="comBlood">
+                        <option value="">সিলেক্ট করুন</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>ছবি আপলোড করুন: <small>(সর্বোচ্চ 800KB)</small></label>
+                <input type="file" id="comImageFile" accept="image/*" style="padding: 8px;">
+                <p id="uploadStatus" style="font-size: 12px; color: #059669; margin-top: 5px;"></p>
+                <img id="imagePreview" style="display:none; width:100px; height:100px; object-fit:cover; border-radius:50%; margin-top:10px; border:2px solid #1e40af;">
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" type="submit" id="submitBtn">যোগ করুন</button>
+                <button class="btn" type="button" onclick="resetCommitteeForm()" style="background:#6b7280;">রিসেট</button>
+            </div>
+        </form>
+
+        <h4 style="margin-top:30px; margin-bottom:10px; color:#1e40af;">কমিটি লিস্ট</h4>
+        <div id="committeeList" class="item-list"></div>
+    </div>
+    <!-- Fund Tab -->
+    <div id="fund" class="content">
+        <h3>ফান্ড ম্যানেজমেন্ট</h3>
+        <div id="fundError" class="error-msg"></div>
+        <div id="fundSuccess" class="success-msg">সফলভাবে সেভ হয়েছে!</div>
+
+        <div class="grid-3 mb-6">
+            <div style="background:#dcfce7;padding:20px;border-radius:10px;text-align:center;">
+                <p style="color:#166534;font-size:14px;">মোট আয়</p>
+                <p id="adminTotalIncome" style="font-size:28px;font-weight:bold;color:#15803d;">০৳</p>
+            </div>
+            <div style="background:#fee2e2;padding:20px;border-radius:10px;text-align:center;">
+                <p style="color:#991b1b;font-size:14px;">মোট ব্যয়</p>
+                <p id="adminTotalExpense" style="font-size:28px;font-weight:bold;color:#dc2626;">০৳</p>
+            </div>
+            <div style="background:#dbeafe;padding:20px;border-radius:10px;text-align:center;">
+                <p style="color:#1e3a8a;font-size:14px;">ব্যালেন্স</p>
+                <p id="adminBalance" style="font-size:28px;font-weight:bold;color:#1e40af;">০৳</p>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div style="background:#f0fdf4;padding:20px;border-radius:10px;border:2px solid #bbf7d0;">
+                <h4 style="color:#15803d;margin-bottom:15px;"><i class="fas fa-plus-circle"></i> আয় যোগ করুন</h4>
+                <form id="incomeForm">
+                    <div class="form-group"><input type="text" id="incomeName" placeholder="আয়ের উৎস" required></div>
+                    <div class="form-group"><input type="number" id="incomeAmount" placeholder="টাকার পরিমাণ" required></div>
+                    <div class="form-group"><input type="date" id="incomeDate" required></div>
+                    <button type="submit" class="btn" style="background:#16a34a;">আয় সেভ করুন</button>
+                </form>
+            </div>
+
+            <div style="background:#fef2f2;padding:20px;border-radius:10px;border:2px solid #fecaca;">
+                <h4 style="color:#dc2626;margin-bottom:15px;"><i class="fas fa-minus-circle"></i> ব্যয় যোগ করুন</h4>
+                <form id="expenseForm">
+                    <div class="form-group"><input type="text" id="expenseName" placeholder="ব্যয়ের খাত" required></div>
+                    <div class="form-group"><input type="number" id="expenseAmount" placeholder="টাকার পরিমাণ" required></div>
+                    <div class="form-group"><input type="date" id="expenseDate" required></div>
+                    <button type="submit" class="btn" style="background:#dc2626;">ব্যয় সেভ করুন</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:30px;">
+            <div>
+                <h4 style="color:#15803d;margin-bottom:10px;">আয়ের লিস্ট</h4>
+                <div id="incomeList" class="item-list" style="max-height:400px;overflow-y:auto;"></div>
+            </div>
+            <div>
+                <h4 style="color:#dc2626;margin-bottom:10px;">ব্যয়ের লিস্ট</h4>
+                <div id="expenseList" class="item-list" style="max-height:400px;overflow-y:auto;"></div>
+            </div>
+        </div>
+    </div>
+<!-- Gallery Tab -->
+    <div id="gallery" class="content">
+        <h3>গ্যালারিতে ছবি যোগ করুন</h3>
+        <div id="galError" class="error-msg"></div>
+        <div class="form-group"><label>ছবির টাইটেল:</label><input type="text" id="galTitle"></div>
+        <div class="form-group"><label>ছবি আপলোড: <small>(সর্বোচ্চ 800KB)</small></label><input type="file" id="galImageFile" accept="image/*" style="padding: 8px;"></div>
+        <button class="btn" id="addGalleryBtn" onclick="addGallery()">যোগ করুন</button>
+        <div id="galleryList" class="item-list"></div>
+    </div>
+    <!-- Projects Tab -->
+    <div id="projects" class="content">
+        <h3>প্রজেক্ট যোগ করুন</h3>
+        <div id="projError" class="error-msg"></div>
+        <div class="form-group"><label>প্রজেক্টের নাম:</label><input type="text" id="projName"></div>
+        <div class="form-group"><label>বিবরণ:</label><textarea id="projDesc"></textarea></div>
+        <div class="grid-2">
+            <div class="form-group"><label>ছবি আপলোড: <small>(সর্বোচ্চ 800KB)</small></label><input type="file" id="projImageFile" accept="image/*" style="padding: 8px;"></div>
+            <div class="form-group">
+                <label>স্ট্যাটাস:</label>
+                <select id="projStatus">
+                    <option value="চলমান">চলমান</option>
+                    <option value="সম্পন্ন">সম্পন্ন</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn" id="addProjectBtn" onclick="addProject()">যোগ করুন</button>
+        <div id="projectsList" class="item-list"></div>
+    </div>
+
+    <!-- About Tab -->
+    <div id="about" class="content">
+        <h3>আমাদের সম্পর্কে সেটিংস</h3>
+        <div id="aboutSuccess" class="success-msg">সফলভাবে আপডেট হয়েছে!</div>
+        <div id="aboutError" class="error-msg"></div>
+        <div class="form-group"><label>কে আমরা?</label><textarea id="aboutWho"></textarea></div>
+        <div class="form-group"><label>আমাদের মিশন</label><textarea id="aboutMission"></textarea></div>
+        <div class="form-group"><label>আমাদের ভিশন</label><textarea id="aboutVision"></textarea></div>
+        <div class="form-group"><label>আমাদের টিম</label><textarea id="aboutTeam"></textarea></div>
+        <button class="btn" onclick="saveAbout()">Firebase এ সেভ করুন</button>
+    </div>
+
+</div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, serverTimestamp, query, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBxM3ARqJFrR-joDhEFCLR91UJPkovun-U",
+  authDomain: "mhf-foundation.firebaseapp.com",
+  projectId: "mhf-foundation",
+  storageBucket: "mhf-foundation.firebasestorage.app",
+  messagingSenderId: "935003103652",
+  appId: "1:935003103652:web:52e57da27fccf37c45e131"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+window.auth = auth;
+window.db = db;
+window.firestore = { doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, serverTimestamp, query, orderBy, onSnapshot };
+
+let editMode = false;
+
+function showError(elementId, message) {
+  const el = document.getElementById(elementId);
+  el.textContent = message;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function showSuccess(elementId) {
+  const el = document.getElementById(elementId);
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    await loadAllData();
+  } else {
+    document.getElementById('loginBox').style.display = 'block';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+});
+
+window.login = async () => {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  document.getElementById('loginError').style.display = 'none';
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(error) {
+    showError('loginError', 'লগইন ফেইল: ' + error.message);
+  }
+}
+
+window.logout = async () => {
+  await signOut(auth);
+}
+
+window.showTab = (tabName) => {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(tabName).classList.add('active');
+  if(tabName === 'fund') loadFundAdmin();
+}
+
+function checkFileSize(file) {
+  if (file.size > 800 * 1024) {
+    alert('ছবির সাইজ 800KB এর বেশি হতে পারবে না! আপনার ছবি ' + (file.size / 1024).toFixed(0) + 'KB');
+    return false;
+  }
+  return true;
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+async function loadAllData() {
+  const { doc, getDoc } = window.firestore;
+  try {
+    const don = await getDoc(doc(window.db, "settings", "donation"));
+    if(don.exists()) {
+      let d = don.data();
+      document.getElementById('bkash').value = d.bkash || '';
+      document.getElementById('nagad').value = d.nagad || '';
+      document.getElementById('rocket').value = d.rocket || '';
+      document.getElementById('bank_name').value = d.bank_name || '';
+      document.getElementById('bank_account').value = d.bank_account || '';
+      document.getElementById('bank_branch').value = d.bank_branch || '';
+      document.getElementById('bank_holder').value = d.bank_holder || '';
+      document.getElementById('bank_swift').value = d.bank_swift || '';
+    }
+
+    const con = await getDoc(doc(window.db, "settings", "contact"));
+    if(con.exists()) {
+      let c = con.data();
+      document.getElementById('address').value = c.address || '';
+      document.getElementById('officeAuthority').value = c.officeAuthority || '';
+      document.getElementById('whatsapp').value = c.whatsapp || '';
+      document.getElementById('conEmail').value = c.email || '';
+      document.getElementById('fb').value = c.fb || '';
+      document.getElementById('yt').value = c.yt || '';
+    }
+
+    const about = await getDoc(doc(window.db, "settings", "about"));
+    if(about.exists()) {
+      let a = about.data();
+      document.getElementById('aboutWho').value = a.who || '';
+      document.getElementById('aboutMission').value = a.mission || '';
+      document.getElementById('aboutVision').value = a.vision || '';
+      document.getElementById('aboutTeam').value = a.team || '';
+    }
+
+    await loadCommittee();
+    await loadGallery();
+    await loadProjects();
+    await loadFundAdmin();
+  } catch(e) {
+    console.error('Load Error:', e);
+  }
+}
+
+window.saveDonation = async () => {
+  const { doc, setDoc } = window.firestore;
+  try {
+    await setDoc(doc(window.db, "settings", "donation"), {
+      bkash: document.getElementById('bkash').value,
+      nagad: document.getElementById('nagad').value,
+      rocket: document.getElementById('rocket').value,
+      bank_name: document.getElementById('bank_name').value,
+      bank_account: document.getElementById('bank_account').value,
+      bank_branch: document.getElementById('bank_branch').value,
+      bank_holder: document.getElementById('bank_holder').value,
+      bank_swift: document.getElementById('bank_swift').value
+    });
+    showSuccess('donSuccess');
+  } catch(e) {
+    showError('donError', 'Error: ' + e.message);
+  }
+}
+
+window.saveContact = async () => {
+  const { doc, setDoc } = window.firestore;
+  try {
+    await setDoc(doc(window.db, "settings", "contact"), {
+      address: document.getElementById('address').value,
+      officeAuthority: document.getElementById('officeAuthority').value,
+      whatsapp: document.getElementById('whatsapp').value,
+      email: document.getElementById('conEmail').value,
+      fb: document.getElementById('fb').value,
+      yt: document.getElementById('yt').value
+    });
+    showSuccess('conSuccess');
+  } catch(e) {
+    showError('conError', 'Error: ' + e.message);
+  }
+}
+
+window.saveAbout = async () => {
+  const { doc, setDoc } = window.firestore;
+  try {
+    await setDoc(doc(window.db, "settings", "about"), {
+      who: document.getElementById('aboutWho').value,
+      mission: document.getElementById('aboutMission').value,
+      vision: document.getElementById('aboutVision').value,
+      team: document.getElementById('aboutTeam').value
+    });
+    showSuccess('aboutSuccess');
+  } catch(e) {
+    showError('aboutError', 'Error: ' + e.message);
+  }
+}
+// ===== COMMITTEE - ক্রম নং + EDIT সিস্টেম =====
+window.submitCommitteeForm = async () => {
+  const { collection, addDoc, updateDoc, doc, serverTimestamp } = window.firestore;
+  const serial = parseInt(document.getElementById('comSerial').value);
+  const name = document.getElementById('comName').value;
+  const post = document.getElementById('comPost').value;
+  const phone = document.getElementById('comPhone').value;
+  const blood = document.getElementById('comBlood').value;
+  const file = document.getElementById('comImageFile').files[0];
+  const editId = document.getElementById('editDocId').value;
+
+  if(!serial ||!name ||!post ||!phone) {
+    showError('comError', 'ক্রম নং, নাম, পদবি, মোবাইল আবশ্যক!');
+    return;
+  }
+
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitBtn').textContent = 'প্রসেস হচ্ছে...';
+
+  try {
+    let imageData = document.getElementById('imagePreview').src;
+
+    if(file) {
+      if (!checkFileSize(file)) {
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').textContent = editMode? 'আপডেট করুন' : 'যোগ করুন';
+        return;
+      }
+      document.getElementById('uploadStatus').textContent = 'ছবি কনভার্ট হচ্ছে...';
+      imageData = await fileToBase64(file);
+    }
+
+    if(!imageData || imageData === window.location.href) {
+      showError('comError', 'ছবি আবশ্যক!');
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('submitBtn').textContent = editMode? 'আপডেট করুন' : 'যোগ করুন';
+      return;
+    }
+
+    const memberData = {
+      serial: serial,
+      name: name,
+      post: post,
+      phone: phone,
+      blood: blood,
+      image: imageData,
+      timestamp: serverTimestamp()
+    };
+
+    if(editMode && editId) {
+      document.getElementById('uploadStatus').textContent = 'আপডেট হচ্ছে...';
+      await updateDoc(doc(window.db, "committee", editId), memberData);
+      showSuccess('comSuccess');
+    } else {
+      document.getElementById('uploadStatus').textContent = 'ডাটাবেসে সেভ হচ্ছে...';
+      await addDoc(collection(window.db, "committee"), memberData);
+      showSuccess('comSuccess');
+    }
+
+    await loadCommittee();
+    resetCommitteeForm();
+
+  } catch(e) {
+    showError('comError', 'Error: ' + e.message);
+  } finally {
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('uploadStatus').textContent = '';
+  }
+}
+
+window.resetCommitteeForm = () => {
+  document.getElementById('committeeForm').reset();
+  document.getElementById('editDocId').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('imagePreview').src = '';
+  document.getElementById('submitBtn').textContent = 'যোগ করুন';
+  document.getElementById('submitBtn').style.background = 'linear-gradient(135deg,#1e40af,#1e3a8a)';
+  editMode = false;
+}
+
+window.editCommittee = (btn) => {
+  const id = btn.dataset.id;
+  const serial = btn.dataset.serial;
+  const name = btn.dataset.name;
+  const post = btn.dataset.post;
+  const phone = btn.dataset.phone;
+  const blood = btn.dataset.blood;
+  const image = btn.dataset.image;
+
+  document.getElementById('editDocId').value = id;
+  document.getElementById('comSerial').value = serial;
+  document.getElementById('comName').value = name;
+  document.getElementById('comPost').value = post;
+  document.getElementById('comPhone').value = phone;
+  document.getElementById('comBlood').value = blood;
+  document.getElementById('imagePreview').src = image;
+  document.getElementById('imagePreview').style.display = 'block';
+  document.getElementById('submitBtn').textContent = 'আপডেট করুন';
+  document.getElementById('submitBtn').style.background = '#ea580c';
+  editMode = true;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('comImageFile').onchange = (e) => {
+  const file = e.target.files[0];
+  if(file && checkFileSize(file)) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('imagePreview').src = e.target.result;
+      document.getElementById('imagePreview').style.display = 'block';
+    }
+    reader.readAsDataURL(file);
+  } else {
+    document.getElementById('comImageFile').value = '';
+    if(!editMode) document.getElementById('imagePreview').style.display = 'none';
+  }
+}
+
+async function loadCommittee() {
+  const { collection, getDocs, query, orderBy } = window.firestore;
+  try {
+    const q = query(collection(window.db, "committee"), orderBy("serial", "asc"));
+    const snap = await getDocs(q);
+    let html = '';
+    snap.forEach(d => {
+      let item = d.data();
+      html += `<div class="item">
+        <div style="display:flex; align-items:center; gap:10px; flex:1;">
+          <div class="serial-badge">${item.serial}</div>
+          <img src="${item.image}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+          <div class="item-info">
+            <b>${item.name}</b> - ${item.post}<br>
+            <small><i class="fas fa-phone"></i> ${item.phone} ${item.blood? `| <span style="color:#dc2626;">🩸 ${item.blood}</span>` : ''}</small>
+          </div>
+        </div>
+        <button class="btn-edit" data-id="${d.id}" data-serial="${item.serial}" data-name="${item.name}" data-post="${item.post}" data-phone="${item.phone}" data-blood="${item.blood}" data-image="${item.image}" onclick="editCommittee(this)">এডিট</button>
+        <button class="btn btn-delete" onclick="deleteItem('committee','${d.id}')">ডিলিট</button>
+      </div>`;
+    });
+    document.getElementById('committeeList').innerHTML = html || '<p style="text-align:center;color:#64748b;">কোনো মেম্বার নেই</p>';
+  } catch(e) { console.error(e); }
+}
+window.addGallery = async () => {
+  const { collection, addDoc, serverTimestamp } = window.firestore;
+  const title = document.getElementById('galTitle').value;
+  const file = document.getElementById('galImageFile').files[0];
+  if(!title ||!file) {
+    showError('galError', 'সব তথ্য দিন!');
+    return;
+  }
+  if (!checkFileSize(file)) return;
+  document.getElementById('addGalleryBtn').disabled = true;
+  document.getElementById('addGalleryBtn').textContent = 'প্রসেস হচ্ছে...';
+  try {
+    const base64 = await fileToBase64(file);
+    await addDoc(collection(window.db, "gallery"), {
+      title,
+      image: base64,
+      timestamp: serverTimestamp()
+    });
+    await loadGallery();
+    document.getElementById('galTitle').value = '';
+    document.getElementById('galImageFile').value = '';
+    alert('গ্যালারি ছবি যোগ হয়েছে! ✅');
+  } catch(e) {
+    showError('galError', 'Error: ' + e.message);
+  } finally {
+    document.getElementById('addGalleryBtn').disabled = false;
+    document.getElementById('addGalleryBtn').textContent = 'যোগ করুন';
+  }
+}
+
+window.addProject = async () => {
+  const { collection, addDoc, serverTimestamp } = window.firestore;
+  const name = document.getElementById('projName').value;
+  const desc = document.getElementById('projDesc').value;
+  const status = document.getElementById('projStatus').value;
+  const file = document.getElementById('projImageFile').files[0];
+  if(!name ||!desc ||!file) {
+    showError('projError', 'সব তথ্য দিন!');
+    return;
+  }
+  if (!checkFileSize(file)) return;
+  document.getElementById('addProjectBtn').disabled = true;
+  document.getElementById('addProjectBtn').textContent = 'প্রসেস হচ্ছে...';
+  try {
+    const base64 = await fileToBase64(file);
+    await addDoc(collection(window.db, "projects"), {
+      name,
+      desc,
+      image: base64,
+      status,
+      timestamp: serverTimestamp()
+    });
+    await loadProjects();
+    document.getElementById('projName').value = '';
+    document.getElementById('projDesc').value = '';
+    document.getElementById('projImageFile').value = '';
+    alert('প্রজেক্ট যোগ হয়েছে! ✅');
+  } catch(e) {
+    showError('projError', 'Error: ' + e.message);
+  } finally {
+    document.getElementById('addProjectBtn').disabled = false;
+    document.getElementById('addProjectBtn').textContent = 'যোগ করুন';
+  }
+}
+
+async function loadGallery() {
+  const { collection, getDocs } = window.firestore;
+  try {
+    const snap = await getDocs(collection(window.db, "gallery"));
+    let html = '';
+    snap.forEach(d => {
+      let item = d.data();
+      html += `<div class="item">
+        <div style="display:flex; align-items:center; gap:10px; flex:1;">
+          <img src="${item.image}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
+          <div class="item-info"><b>${item.title}</b></div>
+        </div>
+        <button class="btn btn-delete" onclick="deleteItem('gallery','${d.id}')">ডিলিট</button>
+      </div>`;
+    });
+    document.getElementById('galleryList').innerHTML = html;
+  } catch(e) { console.error(e); }
+}
+
+async function loadProjects() {
+  const { collection, getDocs } = window.firestore;
+  try {
+    const snap = await getDocs(collection(window.db, "projects"));
+    let html = '';
+    snap.forEach(d => {
+      let item = d.data();
+      html += `<div class="item">
+        <div style="display:flex; align-items:center; gap:10px; flex:1;">
+          <img src="${item.image}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
+          <div class="item-info"><b>${item.name}</b> - ${item.status}</div>
+        </div>
+        <button class="btn btn-delete" onclick="deleteItem('projects','${d.id}')">ডিলিট</button>
+      </div>`;
+    });
+    document.getElementById('projectsList').innerHTML = html;
+  } catch(e) { console.error(e); }
+}
+window.deleteItem = async (col, id) => {
+  if(confirm('ডিলিট করবেন?')) {
+    const { doc, deleteDoc } = window.firestore;
+    try {
+      await deleteDoc(doc(window.db, col, id));
+      if(col === 'committee') await loadCommittee();
+      if(col === 'gallery') await loadGallery();
+      if(col === 'projects') await loadProjects();
+    } catch(e) {
+      alert('Delete Error: ' + e.message);
+    }
+  }
+}
+
+// Fund Management
+async function loadFundAdmin() {
+    const { collection, query, orderBy, onSnapshot } = window.firestore;
+    let totalIncome = 0, totalExpense = 0;
+
+    const incomeQ = query(collection(window.db, "income"), orderBy("timestamp", "desc"));
+    onSnapshot(incomeQ, (snap) => {
+        const incomeList = document.getElementById('incomeList');
+        incomeList.innerHTML = '';
+        totalIncome = 0;
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            totalIncome += d.amount;
+            incomeList.innerHTML += `
+            <div class="item" style="background:#f0fdf4;">
+                <div class="item-info">
+                    <b>${d.name}</b><br>
+                    <small>${d.date} - ${d.amount.toLocaleString('bn-BD')}৳</small>
+                </div>
+                <button class="btn btn-delete" onclick="deleteIncome('${docSnap.id}')">ডিলিট</button>
+            </div>`;
+        });
+        updateFundSummary(totalIncome, totalExpense);
+    });
+
+    const expenseQ = query(collection(window.db, "expense"), orderBy("timestamp", "desc"));
+    onSnapshot(expenseQ, (snap) => {
+        const expenseList = document.getElementById('expenseList');
+        expenseList.innerHTML = '';
+        totalExpense = 0;
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            totalExpense += d.amount;
+            expenseList.innerHTML += `
+            <div class="item" style="background:#fef2f2;">
+                <div class="item-info">
+                    <b>${d.name}</b><br>
+                    <small>${d.date} - ${d.amount.toLocaleString('bn-BD')}৳</small>
+                </div>
+                <button class="btn btn-delete" onclick="deleteExpense('${docSnap.id}')">ডিলিট</button>
+            </div>`;
+        });
+        updateFundSummary(totalIncome, totalExpense);
+    });
+}
+
+function updateFundSummary(income, expense) {
+    document.getElementById('adminTotalIncome').textContent = income.toLocaleString('bn-BD') + '৳';
+    document.getElementById('adminTotalExpense').textContent = expense.toLocaleString('bn-BD') + '৳';
+    document.getElementById('adminBalance').textContent = (income - expense).toLocaleString('bn-BD') + '৳';
+}
+
+document.getElementById('incomeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const { collection, addDoc, serverTimestamp } = window.firestore;
+    try {
+        await addDoc(collection(window.db, "income"), {
+            name: document.getElementById('incomeName').value,
+            amount: parseFloat(document.getElementById('incomeAmount').value),
+            date: document.getElementById('incomeDate').value,
+            timestamp: serverTimestamp()
+        });
+        document.getElementById('incomeForm').reset();
+        showSuccess('fundSuccess');
+    } catch(e) {
+        showError('fundError', 'Error: ' + e.message);
+    }
+});
+
+document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const { collection, addDoc, serverTimestamp } = window.firestore;
+    try {
+        await addDoc(collection(window.db, "expense"), {
+            name: document.getElementById('expenseName').value,
+            amount: parseFloat(document.getElementById('expenseAmount').value),
+            date: document.getElementById('expenseDate').value,
+            timestamp: serverTimestamp()
+        });
+        document.getElementById('expenseForm').reset();
+        showSuccess('fundSuccess');
+    } catch(e) {
+        showError('fundError', 'Error: ' + e.message);
+    }
+});
+
+window.deleteIncome = async (id) => {
+    if(confirm('এই আয় ডিলিট করবেন?')) {
+        const { doc, deleteDoc } = window.firestore;
+        try {
+            await deleteDoc(doc(window.db, "income", id));
+        } catch(e) {
+            alert('Delete Error: ' + e.message);
+        }
+    }
+}
+
+window.deleteExpense = async (id) => {
+    if(confirm('এই ব্যয় ডিলিট করবেন?')) {
+        const { doc, deleteDoc } = window.firestore;
+        try {
+            await deleteDoc(doc(window.db, "expense", id));
+        } catch(e) {
+            alert('Delete Error: ' + e.message);
+        }
+    }
+}
+</script>
+
+</body>
+</html>
