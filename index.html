@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মেঘনা হিউম্যানিটি ফাউন্ডেশন - MHF Foundation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap');
+        body { font-family: 'Noto Sans Bengali', sans-serif; }
+        html { scroll-behavior: smooth; }
+       .loading-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Navbar -->
+<nav class="bg-green-700 text-white p-4 sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <img src="images/logo.png" alt="MHF Logo" class="w-9 h-9 rounded-full border-2 border-white flex-shrink-0">
+            <h1 class="text-base md:text-2xl font-bold leading-tight whitespace-nowrap">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+        </div>
+        <div class="hidden md:flex gap-6 items-center">
+            <a href="index.html" class="hover:text-yellow-300">হোম</a>
+            <a href="about.html" class="hover:text-yellow-300">পরিচিতি</a>
+            <a href="#committee" class="hover:text-yellow-300">কমিটি</a>
+            <a href="#fund" class="hover:text-yellow-300">ফান্ড হিসাব</a>
+            <a href="#gallery" class="hover:text-yellow-300">গ্যালারি</a>
+            <a href="contact.html" class="hover:text-yellow-300">যোগাযোগ</a>
+            <a href="donate.html" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full font-bold hover:bg-yellow-300">ডোনেট করুন</a>
+        </div>
+        <button id="menuBtn" class="md:hidden flex-shrink-0"><i class="fas fa-bars text-2xl"></i></button>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden mt-4 space-y-2">
+        <a href="index.html" class="block py-2">হোম</a>
+        <a href="about.html" class="block py-2">পরিচিতি</a>
+        <a href="#committee" class="block py-2">কমিটি</a>
+        <a href="#fund" class="block py-2">ফান্ড হিসাব</a>
+        <a href="#gallery" class="block py-2">গ্যালারি</a>
+        <a href="contact.html" class="block py-2">যোগাযোগ</a>
+        <a href="donate.html" class="block py-2 text-yellow-300 font-bold">ডোনেট করুন</a>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-green-600 to-green-800 text-white py-20 text-center">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h2>
+        <p class="text-xl mb-6">মানবতার সেবায় আমরা অঙ্গীকারবদ্ধ</p>
+        <div class="flex gap-4 justify-center flex-wrap">
+            <a href="contact.html" class="bg-yellow-400 text-green-900 px-8 py-3 rounded-full font-bold hover:bg-yellow-300">যোগাযোগ করুন</a>
+            <a href="donate.html" class="bg-white text-green-700 px-8 py-3 rounded-full font-bold hover:bg-gray-100">ডোনেট করুন</a>
+        </div>
+    </div>
+</section>
+
+<!-- Donation Preview Section -->
+<section class="py-12 bg-gradient-to-br from-yellow-50 to-green-50">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-3 text-green-700">সহযোগিতার হাত বাড়ান</h2>
+        <p class="text-center text-gray-600 mb-8">আপনার ডোনেশন একটি জীবন বদলে দিতে পারে</p>
+        <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div class="bg-white p-5 rounded-lg shadow-md text-center">
+                <div class="text-3xl text-pink-600 mb-2"><i class="fas fa-mobile-alt"></i></div>
+                <h3 class="font-bold mb-2">বিকাশ</h3>
+                <p id="don_bkash_home" class="text-lg font-bold text-pink-600 loading-pulse">লোড হচ্ছে...</p>
+            </div>
+            <div class="bg-white p-5 rounded-lg shadow-md text-center">
+                <div class="text-3xl text-orange-600 mb-2"><i class="fas fa-wallet"></i></div>
+                <h3 class="font-bold mb-2">নগদ</h3>
+                <p id="don_nagad_home" class="text-lg font-bold text-orange-600 loading-pulse">লোড হচ্ছে...</p>
+            </div>
+            <div class="bg-white p-5 rounded-lg shadow-md text-center">
+                <div class="text-3xl text-blue-600 mb-2"><i class="fas fa-university"></i></div>
+                <h3 class="font-bold mb-2">ব্যাংক</h3>
+                <p id="don_bank_home" class="text-sm font-bold text-blue-600 loading-pulse">লোড হচ্ছে...</p>
+            </div>
+        </div>
+        <div class="text-center mt-6">
+            <a href="donate.html" class="text-green-700 font-bold hover:underline">সব ডোনেশন অপশন দেখুন →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Committee Section -->
+<section id="committee" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-10 text-green-700">আমাদের কমিটি</h2>
+        <div id="committee_cards" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div class="text-center col-span-full text-gray-500 loading-pulse">কমিটি লোড হচ্ছে...</div>
+        </div>
+    </div>
+</section>
+
+<!-- Fund Section -->
+<section id="fund" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">ফান্ড হিসাব</h2>
+            <p class="text-gray-600">আমাদের সকল আয়-ব্যয়ের স্বচ্ছ হিসাব</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-xl shadow-md text-center border-t-4 border-green-500">
+                <i class="fas fa-arrow-down text-3xl text-green-500 mb-3"></i>
+                <h3 class="text-gray-500 text-lg">মোট আয়</h3>
+                <p id="totalIncome" class="text-3xl font-bold text-green-600 mt-2 loading-pulse">০ টাকা</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md text-center border-t-4 border-red-500">
+                <i class="fas fa-arrow-up text-3xl text-red-500 mb-3"></i>
+                <h3 class="text-gray-500 text-lg">মোট ব্যয়</h3>
+                <p id="totalExpense" class="text-3xl font-bold text-red-600 mt-2 loading-pulse">০ টাকা</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md text-center border-t-4 border-blue-500">
+                <i class="fas fa-wallet text-3xl text-blue-500 mb-3"></i>
+                <h3 class="text-gray-500 text-lg">বর্তমান ব্যালেন্স</h3>
+                <p id="currentBalance" class="text-3xl font-bold text-blue-600 mt-2 loading-pulse">০ টাকা</p>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-xl font-bold text-green-600 mb-4"><i class="fas fa-list"></i> সর্বশেষ ৫টি আয়</h3>
+                <div id="publicIncomeList" class="space-y-3">
+                    <p class="text-gray-500 text-center loading-pulse">লোড হচ্ছে...</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-xl font-bold text-red-600 mb-4"><i class="fas fa-list"></i> সর্বশেষ ৫টি ব্যয়</h3>
+                <div id="publicExpenseList" class="space-y-3">
+                    <p class="text-gray-500 text-center loading-pulse">লোড হচ্ছে...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Gallery Section -->
+<section id="gallery" class="py-16 bg-gray-100">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-10 text-green-700">গ্যালারি</h2>
+        <div id="gallery_list" class="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div class="text-center col-span-full text-gray-500 loading-pulse">গ্যালারি লোড হচ্ছে...</div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-10 text-green-700">আমাদের প্রজেক্ট</h2>
+        <div id="projects_list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="text-center col-span-full text-gray-500 loading-pulse">প্রজেক্ট লোড হচ্ছে...</div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-green-900 text-white py-10">
+    <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-3 gap-8 text-center md:text-left">
+            <div>
+                <h3 class="text-xl font-bold mb-4">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h3>
+                <p id="footer_address" class="text-gray-300">কমলনগর, লক্ষ্মীপুর জেলা</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">যোগাযোগ</h3>
+                <p class="text-gray-300"><i class="fas fa-envelope"></i> <span id="footer_email">info@mhf.com</span></p>
+                <p class="text-gray-300"><i class="fas fa-mobile-alt"></i> <span id="footer_bkash">বিকাশ: লোড হচ্ছে...</span></p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">সোশ্যাল মিডিয়া</h3>
+                <div class="flex gap-4 justify-center md:justify-start">
+                    <a id="footer_fb" href="#" target="_blank" class="text-3xl hover:text-blue-400"><i class="fab fa-facebook"></i></a>
+                    <a id="footer_yt" href="#" target="_blank" class="text-3xl hover:text-red-500"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-8 pt-8 border-t border-green-700">
+            <p>&copy; 2026 মেঘনা হিউম্যানিটি ফাউন্ডেশন। সর্বস্বত্ব সংরক্ষিত।</p>
+        </div>
+    </div>
+</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, onSnapshot, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBxM3ARqJFrR-joDhEFCLR91UJPkovun-U",
+  authDomain: "mhf-foundation.firebaseapp.com",
+  projectId: "mhf-foundation",
+  storageBucket: "mhf-foundation.firebasestorage.app",
+  messagingSenderId: "935003103652",
+  appId: "1:935003103652:web:52e57da27fccf37c45e131"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Mobile Menu
+document.getElementById('menuBtn').onclick = () => {
+    document.getElementById('mobileMenu').classList.toggle('hidden');
+}
+
+// Real-time Committee
+function loadCommittee() {
+    const q = query(collection(db, "committee"), orderBy("timestamp", "desc"));
+    onSnapshot(q, (snap) => {
+        const committee_cards = document.getElementById('committee_cards');
+        if (snap.empty) {
+            committee_cards.innerHTML = '<div class="text-center col-span-full text-gray-500">কোনো কমিটি মেম্বার যোগ করা হয়নি</div>';
+            return;
+        }
+        committee_cards.innerHTML = '';
+        snap.forEach((doc) => {
+            const data = doc.data();
+            const whatsappLink = `https://wa.me/88${data.phone}?text=আসসালামু আলাইকুম, ${data.name} ভাই। মেঘনা হিউম্যানিটি ফাউন্ডেশন সম্পর্কে জানতে চাই।`;
+            committee_cards.innerHTML += `
+            <div class="bg-white p-4 rounded-lg shadow-lg text-center hover:shadow-xl transition">
+                <img src="${data.image || 'images/default.jpg'}" class="w-32 h-32 object-cover rounded-full mx-auto mb-3 border-4 border-green-600">
+                <h3 class="font-bold text-lg">${data.name}</h3>
+                <p class="text-green-700 font-semibold mb-2">${data.post}</p>
+                ${data.blood? `<p class="text-sm mb-3"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full font-bold">🩸 ${data.blood}</span></p>` : ''}
+                <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm hover:bg-green-600 transition">
+                    <i class="fab fa-whatsapp text-lg"></i> ${data.phone}
+                </a>
+            </div>`;
+        });
+    }, (error) => {
+        console.error("Committee Error:", error);
+        document.getElementById('committee_cards').innerHTML = '<div class="text-center col-span-full text-red-500">লোড করতে সমস্যা হয়েছে</div>';
+    });
+}
+
+// Real-time Gallery
+function loadGallery() {
+    const q = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
+    onSnapshot(q, (snap) => {
+        const gallery_list = document.getElementById('gallery_list');
+        if (snap.empty) {
+            gallery_list.innerHTML = '<div class="text-center col-span-full text-gray-500">কোনো ছবি যোগ করা হয়নি</div>';
+            return;
+        }
+        gallery_list.innerHTML = '';
+        snap.forEach((doc) => {
+            const data = doc.data();
+            gallery_list.innerHTML += `
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
+                <img src="${data.image}" class="w-full h-56 object-cover">
+                <p class="p-3 text-center font-semibold">${data.title}</p>
+            </div>`;
+        });
+    }, (error) => {
+        console.error("Gallery Error:", error);
+        document.getElementById('gallery_list').innerHTML = '<div class="text-center col-span-full text-red-500">লোড করতে সমস্যা হয়েছে</div>';
+    });
+}
+
+// Real-time Projects
+function loadProjects() {
+    const q = query(collection(db, "projects"), orderBy("timestamp", "desc"));
+    onSnapshot(q, (snap) => {
+        const projects_list = document.getElementById('projects_list');
+        if (snap.empty) {
+            projects_list.innerHTML = '<div class="text-center col-span-full text-gray-500">কোনো প্রজেক্ট যোগ করা হয়নি</div>';
+            return;
+        }
+        projects_list.innerHTML = '';
+        snap.forEach((doc) => {
+            const data = doc.data();
+            projects_list.innerHTML += `
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
+                <img src="${data.image}" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="font-bold text-lg mb-2">${data.name}</h3>
+                    <p class="text-sm text-gray-600 mb-3">${data.desc}</p>
+                    <span class="inline-block px-3 py-1 rounded-full text-sm ${data.status === 'চলমান' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">${data.status}</span>
+                </div>
+            </div>`;
+        });
+    }, (error) => {
+        console.error("Projects Error:", error);
+        document.getElementById('projects_list').innerHTML = '<div class="text-center col-span-full text-red-500">লোড করতে সমস্যা হয়েছে</div>';
+    });
+}
+
+// Real-time Settings
+function loadSettings() {
+    // Contact
+    onSnapshot(doc(db, "settings", "contact"), (docSnap) => {
+        if(docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('footer_address').textContent = data.address || 'কমলনগর, লক্ষ্মীপুর জেলা';
+            document.getElementById('footer_email').textContent = data.email || 'info@mhf.com';
+            document.getElementById('footer_bkash').textContent = `বিকাশ: ${data.bkash || 'নেই'}`;
+            document.getElementById('footer_fb').href = data.fb || '#';
+            if(data.yt) document.getElementById('footer_yt').href = data.yt;
+        }
+    });
+
+    // Donation
+    onSnapshot(doc(db, "settings", "donation"), (docSnap) => {
+        if(docSnap.exists()) {
+            const d = docSnap.data();
+            document.getElementById('don_bkash_home').textContent = d.bkash || 'নেই';
+            document.getElementById('don_nagad_home').textContent = d.nagad || 'নেই';
+            document.getElementById('don_bank_home').textContent = d.bank_name || 'নেই';
+            document.getElementById('don_bkash_home').classList.remove('loading-pulse');
+            document.getElementById('don_nagad_home').classList.remove('loading-pulse');
+            document.getElementById('don_bank_home').classList.remove('loading-pulse');
+        }
+    });
+}
+
+// Load Fund Data for Public
+async function loadFundData() {
+    try {
+        let totalIncome = 0;
+        let totalExpense = 0;
+        
+        // Calculate Total Income
+        const incomeSnap = await getDocs(query(collection(db, "income"), orderBy("timestamp", "desc")));
+        let incomeHtml = '';
+        let incomeCount = 0;
+        incomeSnap.forEach(doc => {
+            const data = doc.data();
+            totalIncome += data.amount;
+            if(incomeCount < 5){
+                incomeHtml += `<div class="flex justify-between items-center border-b pb-2">
+                    <div>
+                        <p class="font-semibold">${data.name}</p>
+                        <p class="text-sm text-gray-500">${data.date}</p>
+                    </div>
+                    <p class="font-bold text-green-600">+${data.amount.toLocaleString('bn-BD')}৳</p>
+                </div>`;
+                incomeCount++;
+            }
+        });
+        
+        // Calculate Total Expense
+        const expenseSnap = await getDocs(query(collection(db, "expense"), orderBy("timestamp", "desc")));
+        let expenseHtml = '';
+        let expenseCount = 0;
+        expenseSnap.forEach(doc => {
+            const data = doc.data();
+            totalExpense += data.amount;
+            if(expenseCount < 5){
+                expenseHtml += `<div class="flex justify-between items-center border-b pb-2">
+                    <div>
+                        <p class="font-semibold">${data.name}</p>
+                        <p class="text-sm text-gray-500">${data.date}</p>
+                    </div>
+                    <p class="font-bold text-red-600">-${data.amount.toLocaleString('bn-BD')}৳</p>
+                </div>`;
+                expenseCount++;
+            }
+        });
+        
+        // Update UI
+        document.getElementById('totalIncome').textContent = totalIncome.toLocaleString('bn-BD') + ' টাকা';
+        document.getElementById('totalExpense').textContent = totalExpense.toLocaleString('bn-BD') + ' টাকা';
+        document.getElementById('currentBalance').textContent = (totalIncome - totalExpense).toLocaleString('bn-BD') + ' টাকা';
+        document.getElementById('totalIncome').classList.remove('loading-pulse');
+        document.getElementById('totalExpense').classList.remove('loading-pulse');
+        document.getElementById('currentBalance').classList.remove('loading-pulse');
+        document.getElementById('publicIncomeList').innerHTML = incomeHtml || '<p class="text-gray-500 text-center">কোনো আয় নেই</p>';
+        document.getElementById('publicExpenseList').innerHTML = expenseHtml || '<p class="text-gray-500 text-center">কোনো ব্যয় নেই</p>';
+        
+    } catch (error) {
+        console.error("Fund data load error:", error);
+        document.getElementById('publicIncomeList').innerHTML = '<p class="text-red-500 text-center">লোড করতে সমস্যা হয়েছে</p>';
+        document.getElementById('publicExpenseList').innerHTML = '<p class="text-red-500 text-center">লোড করতে সমস্যা হয়েছে</p>';
+    }
+}
+
+// Load All
+loadCommittee();
+loadGallery();
+loadProjects();
+loadSettings();
+loadFundData();
+</script>
+</body>
+</html>
