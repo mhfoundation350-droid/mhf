@@ -1,0 +1,25 @@
+{
+  "name": "মেঘনা হিউম্যানিটি ফাউন্ডেশন",
+  "short_name": "MHF",
+  "description": "সেবা ও মমতায় উজ্জ্বল আগামী",
+  "start_url": "/mhf/",
+  "scope": "/mhf/",
+  "display": "standalone",
+  "background_color": "#15803d",
+  "theme_color": "#15803d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
