@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>কমিটি - মেঘনা হিউম্যানিটি ফাউন্ডেশন</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <link rel="apple-touch-icon" href="images/logo.png">
+  <link rel="shortcut icon" href="images/logo.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap');
+    body { font-family: 'Noto Sans Bengali', sans-serif; }
+    html { scroll-behavior: smooth; }
+.gradient-bg { background: linear-gradient(135deg, #166534 0%, #15803d 100%); }
+.serial-badge {position:absolute;top:6px;left:6px;width:24px;height:24px;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;box-shadow:0 2px 6px rgba(0,0,0,.3);z-index:10}
+.post-header {grid-column:1/-1;text-align:center;font-size:1.5rem;font-weight:700;color:#166534;margin:2rem 0 1rem;padding-bottom:.5rem;border-bottom:3px solid #15803d}
+    @media (max-width:768px){.post-header{font-size:1.25rem;margin:1.5rem 0.75rem}}
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="bg-green-700 text-white p-4 sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <img src="images/logo.png" alt="MHF Logo" class="w-9 h-9 rounded-full border-2 border-white flex-shrink-0">
+        <h1 class="text-base md:text-2xl font-bold leading-tight whitespace-nowrap">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+      </div>
+      <div class="hidden md:flex gap-6 items-center">
+        <a href="index.html" class="hover:text-yellow-300">হোম</a>
+        <a href="about.html" class="hover:text-yellow-300">পরিচিতি</a>
+        <a href="committee.html" class="hover:text-yellow-300 font-bold">কমিটি</a>
+        <a href="projects.html" class="hover:text-yellow-300">প্রজেক্ট</a>
+        <a href="report.html" class="hover:text-yellow-300">আয়-ব্যয়</a>
+        <a href="gallery.html" class="hover:text-yellow-300">গ্যালারি</a>
+        <a href="contact.html" class="hover:text-yellow-300">যোগাযোগ</a>
+        <a href="donate.html" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full font-bold hover:bg-yellow-300">ডোনেট করুন</a>
+      </div>
+      <button id="menuBtn" class="md:hidden flex-shrink-0"><i class="fas fa-bars text-2xl"></i></button>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden mt-4 space-y-2">
+      <a href="index.html" class="block py-2">হোম</a>
+      <a href="about.html" class="block py-2">পরিচিতি</a>
+      <a href="committee.html" class="block py-2 font-bold">কমিটি</a>
+      <a href="projects.html" class="block py-2">প্রজেক্ট</a>
+      <a href="report.html" class="block py-2">আয়-ব্যয়</a>
+      <a href="gallery.html" class="block py-2">গ্যালারি</a>
+      <a href="contact.html" class="block py-2">যোগাযোগ</a>
+      <a href="donate.html" class="block py-2 text-yellow-300 font-bold">ডোনেট করুন</a>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <div class="gradient-bg text-white py-16 text-center">
+    <h2 class="text-5xl font-bold">আমাদের কমিটি</h2>
+    <p class="text-xl mt-4 opacity-90">সেবা ও মমতায় উজ্জ্বল আগামী</p>
+  </div>
+
+  <!-- Committee Members -->
+  <div class="container mx-auto px-4 py-16">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6" id="committeeList">
+      <!-- নতুন লোডার -->
+      <div id="globalLoader" class="col-span-full flex flex-col items-center justify-center py-16">
+        <div class="relative w-14 h-14">
+          <div class="absolute w-14 h-14 border-4 border-green-100 rounded-full"></div>
+          <div class="absolute w-14 h-14 border-4 border-t-green-600 border-r-green-600 rounded-full animate-spin"></div>
+        </div>
+        <p class="text-gray-600 mt-4 font-semibold">লোড হচ্ছে...</p>
+      </div>
+    </div>
+  </div>
+
+<!-- Footer -->
+<footer class="bg-green-900 text-white py-10">
+    <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-3 gap-8 text-center md:text-left">
+            <div>
+                <h3 class="text-xl font-bold mb-4">মেঘনা হিউম্যানিটি ফাউন্ডেশন</h3>
+                <p class="text-gray-300">কমলনগর, লক্ষ্মীপুর জেলা</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">যোগাযোগ</h3>
+                <p class="text-gray-300 mb-3">
+                    <i class="fas fa-envelope"></i>
+                    <a href="mailto:mhfoundation350@gmail.com" class="hover:text-green-300">mhfoundation350@gmail.com</a>
+                </p>
+                <p class="text-gray-300 font-bold mb-2">প্রতিষ্ঠাতা:</p>
+                <a href="https://wa.me/8801645444350" target="_blank" class="text-gray-300 block hover:text-green-300 mb-1.5">
+                    <i class="fab fa-whatsapp"></i> মোঃ আলমগীর হোসেন - 01645-444350
+                </a>
+                <a href="https://wa.me/8801778937090" target="_blank" class="text-gray-300 block hover:text-green-300">
+                    <i class="fab fa-whatsapp"></i> মনির হোসেন (সুজন) - 01778-937090
+                </a>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">সোশ্যাল মিডিয়া</h3>
+                <div class="flex gap-4 justify-center md:justify-start">
+                    <a href="#" target="_blank" class="text-3xl hover:text-blue-400"><i class="fab fa-facebook"></i></a>
+                    <a href="#" target="_blank" class="text-3xl hover:text-red-500"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        <div class="text-center mt-8 pt-8 border-t border-green-700">
+            <p>&copy; 2026 মেঘনা হিউম্যানিটি ফাউন্ডেশন। সর্বস্বত্ব সংরক্ষিত।</p>
+        </div>
+    </div>
+</footer>
+
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBxM3ARqJFrR-joDhEFCLR91UJPkovun-U",
+  authDomain: "mhf-foundation.firebaseapp.com",
+  projectId: "mhf-foundation",
+  storageBucket: "mhf-foundation.firebasestorage.app",
+  messagingSenderId: "935003103652",
+  appId: "1:935003103652:web:52e57da27fccf37c45e131"
+};
+
+// Firebase duplicate initialize ফিক্স
+const app = getApps().length === 0? initializeApp(firebaseConfig) : getApp();
+const db = getFirestore(app);
+
+document.getElementById('menuBtn').onclick = () => {
+    document.getElementById('mobileMenu').classList.toggle('hidden');
+}
+
+const postOrder = [
+  'উপদেষ্টা',
+  'সভাপতি',
+  'সহ-সভাপতি',
+  'সাধারণ সম্পাদক',
+  'যুগ্ম সাধারণ সম্পাদক',
+  'কোষাধ্যক্ষ',
+  'সাংগঠনিক সম্পাদক',
+  'প্রচার সম্পাদক',
+  'দপ্তর সম্পাদক',
+  'সমাজ কল্যাণ সম্পাদক',
+  'সিনিয়র সদস্য',
+  'সদস্য'
+];
+
+async function loadCommittee() {
+    const committeeList = document.getElementById('committeeList');
+    const loader = document.getElementById('globalLoader');
+
+    try {
+        // Force করে সার্ভার থেকে ডাটা আনবে - ক্যাশ ইস্যু ফিক্স
+        const snap = await getDocs(collection(db, "committee"));
+        renderCommittee(snap);
+    } catch (error) {
+        console.error("Committee Error:", error);
+        if(loader) loader.style.display = 'none';
+        committeeList.innerHTML = `
+          <div class="col-span-full flex flex-col items-center justify-center py-16">
+            <i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-4"></i>
+            <p class="text-red-600 font-semibold">ডাটা লোড করতে সমস্যা হয়েছে</p>
+            <p class="text-gray-500 text-sm mt-2">${error.message}</p>
+          </div>`;
+    }
+}
+
+function renderCommittee(snap) {
+    const committeeList = document.getElementById('committeeList');
+    const loader = document.getElementById('globalLoader');
+
+    if(loader) loader.style.display = 'none';
+
+    if (snap.empty) {
+        committeeList.innerHTML = `
+          <div class="col-span-full flex flex-col items-center justify-center py-16">
+            <i class="fas fa-users text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500 font-semibold">কোনো কমিটি মেম্বার যোগ করা হয়নি</p>
+          </div>`;
+        return;
+    }
+
+    let members = [];
+    snap.forEach((doc) => {
+        members.push({ id: doc.id,...doc.data() });
+    });
+
+    const grouped = {};
+    members.forEach(member => {
+        const post = member.post || 'অন্যান্য';
+        if (!grouped[post]) grouped[post] = [];
+        grouped[post].push(member);
+    });
+
+    Object.keys(grouped).forEach(post => {
+        grouped[post].sort((a, b) => {
+            let serialA = (a.serial!== undefined && a.serial!== null && a.serial!== '')? parseInt(a.serial) : 9999;
+            let serialB = (b.serial!== undefined && b.serial!== null && b.serial!== '')? parseInt(b.serial) : 9999;
+            return serialA - serialB;
+        });
+    });
+
+    committeeList.innerHTML = '';
+
+    postOrder.forEach(post => {
+        if (grouped[post] && grouped[post].length > 0) {
+            committeeList.innerHTML += `<h3 class="post-header">${post}</h3>`;
+            grouped[post].forEach((data) => {
+                const phoneClean = data.phone? data.phone.toString().replace(/[^0-9]/g, '') : '';
+                const whatsappLink = phoneClean? `https://wa.me/${phoneClean}?text=আসসালামু আলাইকুম, ${data.name} ভাই। মেঘনা হিউম্যানিটি ফাউন্ডেশন সম্পর্কে জানতে চাই।` : '#';
+                const hasSerial = data.serial!== undefined && data.serial!== null && data.serial!== '' && parseInt(data.serial)!== 999;
+
+                committeeList.innerHTML += `
+                <div class="bg-white p-2.5 md:p-4 rounded-lg shadow-md text-center hover:shadow-xl transition relative">
+                    ${hasSerial? `<div class="serial-badge">${data.serial}</div>` : ''}
+                    <img src="${data.image || 'images/logo.png'}" class="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full mx-auto mb-2 border-2 md:border-4 border-green-600">
+                    <h3 class="font-bold text-xs md:text-base leading-tight">${data.name}</h3>
+                    <p class="text-green-700 font-semibold text-xs md:text-sm mb-1">${data.post}</p>
+                    ${data.blood? `<p class="text-xs md:text-xs mb-1.5"><span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold">🩸 ${data.blood}</span></p>` : ''}
+                    ${phoneClean? `
+                    <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-1 bg-green-500 text-white px-2.5 py-1 md:px-3 md:py-1.5 rounded-full text-xs md:text-xs hover:bg-green-600 transition">
+                        <i class="fab fa-whatsapp"></i> +${phoneClean}
+                    </a>` : ''}
+                </div>`;
+            });
+        }
+    });
+
+    Object.keys(grouped).forEach(post => {
+        if (!postOrder.includes(post) && grouped[post].length > 0) {
+            committeeList.innerHTML += `<h3 class="post-header">${post}</h3>`;
+            grouped[post].forEach((data) => {
+                const phoneClean = data.phone? data.phone.toString().replace(/[^0-9]/g, '') : '';
+                const whatsappLink = phoneClean? `https://wa.me/${phoneClean}?text=আসসালামু আলাইকুম, ${data.name} ভাই। মেঘনা হিউম্যানিটি ফাউন্ডেশন সম্পর্কে জানতে চাই।` : '#';
+                const hasSerial = data.serial!== undefined && data.serial!== null && data.serial!== '' && parseInt(data.serial)!== 999;
+
+                committeeList.innerHTML += `
+                <div class="bg-white p-2.5 md:p-4 rounded-lg shadow-md text-center hover:shadow-xl transition relative">
+                    ${hasSerial? `<div class="serial-badge">${data.serial}</div>` : ''}
+                    <img src="${data.image || 'images/logo.png'}" class="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full mx-auto mb-2 border-2 md:border-4 border-green-600">
+                    <h3 class="font-bold text-xs md:text-base leading-tight">${data.name}</h3>
+                    <p class="text-green-700 font-semibold text-xs md:text-sm mb-1">${data.post}</p>
+                    ${data.blood? `<p class="text-xs md:text-xs mb-1.5"><span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold">🩸 ${data.blood}</span></p>` : ''}
+                    ${phoneClean? `
+                    <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-1 bg-green-500 text-white px-2.5 py-1 md:px-3 md:py-1.5 rounded-full text-xs md:text-xs hover:bg-green-600 transition">
+                        <i class="fab fa-whatsapp"></i> +${phoneClean}
+                    </a>` : ''}
+                </div>`;
+            });
+        }
+    });
+}
+
+// DOM রেডি হওয়ার পর লোড হবে
+document.addEventListener('DOMContentLoaded', () => {
+    loadCommittee();
+});
+</script>
+</body>
+</html>
