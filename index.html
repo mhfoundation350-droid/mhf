@@ -600,12 +600,16 @@ async function loadFundData() {
     }
 }
 
-// Load All
-loadCommittee();
-loadGallery();
-loadProjects();
-loadSettings();
-loadFundData();
+// Load All - DOM রেডি হওয়ার পর লোড হবে
+document.addEventListener('DOMContentLoaded', async () => {
+    await Promise.all([
+        loadCommittee(),
+        loadGallery(),
+        loadProjects(),
+        loadSettings(),
+        loadFundData()
+    ]);
+});
 
 // PWA Service Worker Register
 if ('serviceWorker' in navigator) {
