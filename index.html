@@ -628,24 +628,22 @@ if ('serviceWorker' in navigator) {
 
 <script>
 let isDragging = false;
-let clickStartTime = 0;
+let startX = 0;
+let startY = 0;
 let hasMoved = false;
 
 const waBtn = document.getElementById("waBtn");
 const waFloat = document.getElementById("waFloat");
 const waOptions = document.getElementById("waOptions");
 
-waBtn.addEventListener('mousedown', function(e) {
-   clickStartTime = Date.now();
-   hasMoved = false;
-});
-
-waBtn.addEventListener('mouseup', function(e) {
-   if (!hasMoved && Date.now() - clickStartTime < 200) {
+// ট্যাপ করলে মেনু খুলবে
+waBtn.addEventListener('click', function(e) {
+   if (!hasMoved) {
       waOptions.style.display = waOptions.style.display === "block"? "none" : "block";
    }
 });
 
+// বাইরে ক্লিক করলে বন্ধ
 document.addEventListener('click', function(e) {
    if (!waFloat.contains(e.target)) {
       waOptions.style.display = "none";
@@ -664,33 +662,42 @@ if (savedPos) {
 }
 
 function dragStart(e) {
-   isDragging = true;
-   hasMoved = false;
-   waFloat.classList.add('wa-dragging');
    const touch = e.type === 'touchstart'? e.touches[0] : e;
+   startX = touch.clientX;
+   startY = touch.clientY;
+   hasMoved = false;
+   
    const rect = waFloat.getBoundingClientRect();
    offsetX = touch.clientX - rect.left;
    offsetY = touch.clientY - rect.top;
+   
    waOptions.style.display = "none";
-   e.preventDefault();
 }
 
 function dragMove(e) {
-   if (!isDragging) return;
-   hasMoved = true;
    const touch = e.type === 'touchmove'? e.touches[0] : e;
-   let x = touch.clientX - offsetX;
-   let y = touch.clientY - offsetY;
    
-   const maxX = window.innerWidth - 66;
-   const maxY = window.innerHeight - 66;
-   x = Math.max(10, Math.min(x, maxX));
-   y = Math.max(10, Math.min(y, maxY));
-   
-   waFloat.style.left = x + 'px';
-   waFloat.style.top = y + 'px';
-   waFloat.style.right = 'auto';
-   waFloat.style.bottom = 'auto';
+   if (Math.abs(touch.clientX - startX) > 5 || Math.abs(touch.clientY - startY) > 5) {
+      if (!isDragging) {
+         isDragging = true;
+         waFloat.classList.add('wa-dragging');
+      }
+      hasMoved = true;
+      e.preventDefault();
+      
+      let x = touch.clientX - offsetX;
+      let y = touch.clientY - offsetY;
+      
+      const maxX = window.innerWidth - 66;
+      const maxY = window.innerHeight - 66;
+      x = Math.max(10, Math.min(x, maxX));
+      y = Math.max(10, Math.min(y, maxY));
+      
+      waFloat.style.left = x + 'px';
+      waFloat.style.top = y + 'px';
+      waFloat.style.right = 'auto';
+      waFloat.style.bottom = 'auto';
+   }
 }
 
 function dragEnd() {
@@ -701,7 +708,10 @@ function dragEnd() {
          left: rect.left + 'px',
          top: rect.top + 'px'
       }));
-      setTimeout(() => { isDragging = false }, 50);
+      setTimeout(() => { 
+         isDragging = false;
+         hasMoved = false;
+      }, 100);
    }
 }
 
@@ -709,7 +719,7 @@ waBtn.addEventListener('mousedown', dragStart);
 document.addEventListener('mousemove', dragMove);
 document.addEventListener('mouseup', dragEnd);
 
-waBtn.addEventListener('touchstart', dragStart, {passive: false});
+waBtn.addEventListener('touchstart', dragStart, {passive: true});
 document.addEventListener('touchmove', dragMove, {passive: false});
 document.addEventListener('touchend', dragEnd);
 </script>
