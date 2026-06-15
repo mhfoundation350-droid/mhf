@@ -243,7 +243,27 @@
             <p>&copy; 2026 মেঘনা হিউম্যানিটি ফাউন্ডেশন। সর্বস্বত্ব সংরক্ষিত।</p>
         </div>
     </div>
-</footer>
+    </footer>
+<!-- লাইভ ভিউ কাউন্টার -->
+<div class="fixed bottom-24 right-5 bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2.5 rounded-full shadow-2xl text-sm font-bold z-40 flex items-center gap-2 border-2 border-white/30 backdrop-blur-sm">
+   <span class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+   <span>লাইভ:</span>
+   <span id="liveCount" class="text-yellow-300">8</span>
+   <span>জন</span>
+</div>
+
+<script>
+// লাইভ কাউন্টার - 5-20 জন র‍্যান্ডম দেখাবে
+function updateLiveCount() {
+   const count = Math.floor(Math.random() * 15) + 5;
+   document.getElementById('liveCount').textContent = count;
+}
+updateLiveCount();
+setInterval(updateLiveCount, 8000);
+</script>
+
+<script type="module">
+import { initializeApp } from...
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
