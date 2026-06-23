@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@700;900&display=swap');
 
 * {
   margin: 0;
@@ -14,23 +14,67 @@ body {
 }
 
 .gradient-bg {
-  background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
+  background: linear-gradient(135deg, #0f4c75 0%, #059669 50%, #065f46 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+/* ===== হেডারের নাম - ইউনিক প্রিমিয়াম ডিজাইন ===== */
+.navbar-brand {
+    font-family: 'Noto Serif Bengali', serif !important;
+    font-size: 38px !important; 
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    letter-spacing: 1px !important;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.4), 
+                 0 0 20px rgba(255,255,255,0.2) !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.03) !important;
+    text-shadow: 3px 3px 8px rgba(0,0,0,0.5), 
+                 0 0 30px rgba(255,255,255,0.4) !important;
+}
+
+/* লোগোর সাইজও বড় করলাম */
+.navbar-brand img {
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    border: 3px solid #ffffff !important;
+    box-shadow: 0 0 15px rgba(255,255,255,0.5) !important;
 }
 
 .nav-link { 
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
   transition: all 0.3s ease;
   display: inline-block;
   text-decoration: none;
   color: white;
+  font-weight: 600;
 }
 .nav-link:hover { 
-  background-color: rgba(30, 64, 175, 0.8);
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 .nav-link.active { 
-  background-color: #1d4ed8;
+  background-color: rgba(255, 255, 255, 0.25);
   font-weight: 700;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ===== হিরো সেকশন টাইটেল আরো ইউনিক ===== */
+.gradient-bg h1 {
+    font-family: 'Noto Serif Bengali', serif !important;
+    font-weight: 900 !important;
+    font-size: 3.5rem !important;
+    text-shadow: 4px 4px 8px rgba(0,0,0,0.3) !important;
+    letter-spacing: 2px !important;
 }
 
 .card {
@@ -39,14 +83,16 @@ body {
   border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
 }
 .card:hover {
   box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
   transform: translateY(-4px);
+  border-color: #059669;
 }
 
 .btn-primary {
-  background: #1d4ed8;
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -58,9 +104,9 @@ body {
   text-decoration: none;
 }
 .btn-primary:hover {
-  background: #1e40af;
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px rgba(29, 78, 216, 0.3);
+  box-shadow: 0 10px 15px rgba(29, 78, 216, 0.4);
 }
 
 /* ===== Admin Panel - Edit + Delete + ক্রম নং ===== */
@@ -168,9 +214,20 @@ label {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 22px !important; 
+    gap: 8px !important;
+  }
+  .navbar-brand img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .gradient-bg h1 {
+    font-size: 2.2rem !important;
+  }
   .nav-link {
-    padding: 6px 10px;
-    font-size: 14px;
+    padding: 8px 12px;
+    font-size: 15px;
   }
   .card {
     padding: 16px;
