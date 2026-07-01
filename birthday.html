@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>শুভ জন্মদিন | MHF</title>
+<link href="https://fonts.maateen.me/solaiman-lipi/font.css" rel="stylesheet">
+<style>
+  body { margin: 0; font-family: 'SolaimanLipi', sans-serif; background: #e9eef5; display: flex; flex-direction: column; align-items: center; padding: 15px; gap: 15px; }
+  canvas { max-width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+  .btn { padding: 14px 28px; background: #1E3A8A; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; max-width: 320px; }
+  .btn:active { transform: scale(0.96); }
+</style>
+</head>
+<body>
+
+<canvas id="card" width="1080" height="1080"></canvas>
+<button class="btn" onclick="downloadCard()">📥 কার্ড ডাউনলোড করো</button>
+
+<script>
+const canvas = document.getElementById('card');
+const ctx = canvas.getContext('2d');
+
+// 1. URL থেকে নাম-পদবি নাও
+const params = new URLSearchParams(window.location.search);
+const name = decodeURIComponent(params.get('name') || '');
+const designation = decodeURIComponent(params.get('designation') || '');
+
+// 2. তোমার ডিজাইনটা লোড করো
+const bg = new Image();
+bg.src = 'images/birthday-bg.jpg'; // এই নামেই images ফোল্ডারে রাখবা
+
+bg.onload = () => {
+  // পুরা ছবি আঁকো
+  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+  // নাম লেখো - ডান পাশের উপরের নীল বক্সে
+  if(name){
+    ctx.fillStyle = '#FFFFFF'; 
+    ctx.font = 'bold 40px SolaimanLipi';
+    ctx.textAlign = 'right';
+    ctx.fillText(name, 1020, 768); // X, Y পজিশন
+  }
+
+  // পদবি লেখো - ডান পাশের নিচের নীল বক্সে
+  if(designation){
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '36px SolaimanLipi';
+    ctx.textAlign = 'right';
+    ctx.fillText(designation, 1020, 835); // X, Y পজিশন
+  }
+}
+
+// 3. ডাউনলোড
+function downloadCard() {
+  const link = document.createElement('a');
+  link.download = `MHF-Jonmodin-${name || 'Member'}.png`;
+  link.href = canvas.toDataURL('image/png', 1.0);
+  link.click();
+}
+</script>
+
+</body>
+</html>
