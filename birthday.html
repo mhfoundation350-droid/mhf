@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>জন্মদিনের শুভেচ্ছা | MHF</title>
 <style>
-  body { margin:0; font-family: 'Noto Sans Bengali', sans-serif; background:#f0f2f5; display:flex; justify-content:center; padding:20px; }
+  body { margin:0; font-family: 'Noto Sans Bengali', sans-serif; background:#f0f2f5; display:flex; justify-content:center; padding:10px; }
 .container { max-width: 1080px; width:100%; }
 .form-box { background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); margin-bottom:20px; }
 .form-box label { display:block; font-weight:700; margin-top:10px; margin-bottom:5px; }
 .form-box input { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; font-size:16px; }
 .btn { width:100%; padding:12px; background:#0d47a1; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:700; cursor:pointer; margin-top:15px; }
-  #card { position:relative; display:none; }
-  #card img.bg { width:100%; border-radius:12px; }
+  #card { position:relative; width:100%; }
+  #card img.bg { width:100%; height:auto; display:block; border-radius:12px; }
   #card canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
 </style>
 </head>
@@ -30,7 +30,7 @@
     <button class="btn" onclick="makeCard()">🎂 কার্ড বানাও</button>
   </div>
 
-  <div id="card">
+  <div id="card" style="display:none;">
     <img class="bg" id="bgImg" src="images/birthday-bg.jpg" crossorigin="anonymous">
     <canvas id="c"></canvas>
     <button class="btn" onclick="downloadCard()">📥 কার্ড ডাউনলোড করো</button>
@@ -56,41 +56,47 @@ function makeCard() {
   document.getElementById('card').style.display = 'block';
 
   bg.onload = () => {
-    canvas.width = bg.naturalWidth; // 1080px
-    canvas.height = bg.naturalHeight; // 1080px
-    ctx.drawImage(bg, 0, 0);
+    const W = bg.naturalWidth; // 1080
+    const H = bg.naturalHeight; // 1080
+    canvas.width = W;
+    canvas.height = H;
+    ctx.drawImage(bg, 0, 0, W, H);
     
-    ctx.textAlign = 'center'; // মাঝ বরাবর
+    ctx.textAlign = 'center'; 
     
-    // 1. নাম বসানো - সাদা বৃত্তের ঠিক নিচে
-    ctx.font = 'bold 38px Noto Sans Bengali';
+    // স্কেল হিসাব - মোবাইলেও যাতে না সরে
+    const scaleX = W / 1080; 
+    const scaleY = H / 1080;
+
+    // 1. নাম - সাদা বৃত্তের নিচে মাঝখানে
+    ctx.font = `bold ${Math.round(38 * scaleX)}px Noto Sans Bengali`;
     ctx.fillStyle = '#0d47a1';
-    ctx.fillText(name, 840, 610); // X=840, Y=610
+    ctx.fillText(name, Math.round(840 * scaleX), Math.round(610 * scaleY));
 
-    // 2. পদবি বসানো - নামের নিচে
-    ctx.font = '28px Noto Sans Bengali';
-    ctx.fillText(desig, 840, 655); // X=840, Y=655
+    // 2. পদবি 
+    ctx.font = `${Math.round(28 * scaleX)}px Noto Sans Bengali`;
+    ctx.fillText(desig, Math.round(840 * scaleX), Math.round(655 * scaleY));
 
-    // 3. ছবি বসানো - সাদা বৃত্তের ভিতর একদম পারফেক্ট
+    // 3. ছবি - সাদা বৃত্তের একদম মাঝে
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        const x = 840; // বৃত্তের মাঝ বরাবর X
-        const y = 380; // বৃত্তের মাঝ বরাবর Y 
-        const r = 110; // বৃত্তের রেডিয়াস
+        const x = Math.round(840 * scaleX); // X মাঝ
+        const y = Math.round(380 * scaleY); // Y মাঝ
+        const r = Math.round(110 * scaleX); // রেডিয়াস
         ctx.save();
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI*2);
         ctx.clip();
-        ctx.drawImage(img, x-r, y-r, r*2, r*2); // ছবি গোল করে ফিট
+        ctx.drawImage(img, x-r, y-r, r*2, r*2);
         ctx.restore();
       }
       img.src = e.target.result;
     }
     reader.readAsDataURL(photoFile);
   }
-  bg.src = 'images/birthday-bg.jpg';
+  bg.src = 'images/birthday-bg.jpg?t=' + Date.now(); // Cache clear
 }
 
 function downloadCard(){
