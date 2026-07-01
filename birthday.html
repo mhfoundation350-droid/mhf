@@ -3,62 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>শুভ জন্মদিন | MHF</title>
-<link href="https://fonts.maateen.me/solaiman-lipi/font.css" rel="stylesheet">
+<title>জন্মদিনের শুভেচ্ছা | MHF</title>
 <style>
-  body { margin: 0; font-family: 'SolaimanLipi', sans-serif; background: #e9eef5; display: flex; flex-direction: column; align-items: center; padding: 15px; gap: 15px; }
-  canvas { max-width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-  .btn { padding: 14px 28px; background: #1E3A8A; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; max-width: 320px; }
-  .btn:active { transform: scale(0.96); }
+  body { margin:0; font-family: 'Noto Sans Bengali', sans-serif; background:#f0f2f5; display:flex; justify-content:center; padding:20px; }
+ .container { max-width: 500px; width:100%; }
+ .form-box { background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); margin-bottom:20px; }
+ .form-box label { display:block; font-weight:700; margin-top:10px; margin-bottom:5px; }
+ .form-box input { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; }
+ .btn { width:100%; padding:12px; background:#0d47a1; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:700; cursor:pointer; margin-top:15px; }
+  #card { position:relative; display:none; }
+  #card img.bg { width:100%; border-radius:12px; }
+  #card canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
 </style>
 </head>
 <body>
 
-<canvas id="card" width="1080" height="1080"></canvas>
-<button class="btn" onclick="downloadCard()">📥 কার্ড ডাউনলোড করো</button>
+<div class="container">
+  <!-- 1. ফর্ম অংশ -->
+  <div class="form-box" id="formBox">
+    <h2 style="text-align:center; margin-top:0;">জন্মদিনের কার্ড বানাও</h2>
+    <label>নাম:</label>
+    <input type="text" id="nameInput" placeholder="যেমন: আলহাজ্ব মোঃ করিম">
+    
+    <label>পদবি:</label>
+    <input type="text" id="desigInput" placeholder="যেমন: সভাপতি">
+    
+    <label>ছবি:</label>
+    <input type="file" id="photoInput" accept="image/*">
+    
+    <button class="btn" onclick="makeCard()">🎂 কার্ড বানাও</button>
+  </div>
+
+  <!-- 2. কার্ড অংশ -->
+  <div id="card">
+    <img class="bg" id="bgImg" src="images/birthday-bg.jpg" crossorigin="anonymous">
+    <canvas id="c"></canvas>
+    <button class="btn" onclick="downloadCard()">📥 কার্ড ডাউনলোড করো</button>
+  </div>
+</div>
 
 <script>
-const canvas = document.getElementById('card');
+const bg = document.getElementById('bgImg');
+const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 
-// 1. URL থেকে নাম-পদবি নাও
-const params = new URLSearchParams(window.location.search);
-const name = decodeURIComponent(params.get('name') || '');
-const designation = decodeURIComponent(params.get('designation') || '');
+function makeCard() {
+  const name = document.getElementById('nameInput').value.trim();
+  const desig = document.getElementById('desigInput').value.trim();
+  const photoFile = document.getElementById('photoInput').files[0];
 
-// 2. তোমার ডিজাইনটা লোড করো
-const bg = new Image();
-bg.src = 'images/birthday-bg.jpg'; // এই নামেই images ফোল্ডারে রাখবা
-
-bg.onload = () => {
-  // পুরা ছবি আঁকো
-  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
-
-  // নাম লেখো - ডান পাশের উপরের নীল বক্সে
-  if(name){
-    ctx.fillStyle = '#FFFFFF'; 
-    ctx.font = 'bold 40px SolaimanLipi';
-    ctx.textAlign = 'right';
-    ctx.fillText(name, 1020, 768); // X, Y পজিশন
+  if(!name ||!desig ||!photoFile){
+    alert('নাম, পদবি, ছবি 3টাই দিতে হবে ভাই');
+    return;
   }
 
-  // পদবি লেখো - ডান পাশের নিচের নীল বক্সে
-  if(designation){
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = '36px SolaimanLipi';
+  document.getElementById('formBox').style.display = 'none';
+  document.getElementById('card').style.display = 'block';
+
+  bg.onload = () => {
+    canvas.width = bg.naturalWidth;
+    canvas.height = bg.naturalHeight;
+    ctx.drawImage(bg, 0, 0);
+    
+    // 1. নাম বসানো - ডান পাশে
+    ctx.font = 'bold 45px Noto Sans Bengali';
+    ctx.fillStyle = '#0d47a1';
     ctx.textAlign = 'right';
-    ctx.fillText(designation, 1020, 835); // X, Y পজিশন
+    ctx.fillText(name, canvas.width - 60, 380); 
+
+    // 2. পদবি বসানো
+    ctx.font = '35px Noto Sans Bengali';
+    ctx.fillText(desig, canvas.width - 60, 430); 
+
+    // 3. ছবি বসানো - গোল করে
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const x = canvas.width - 180; // ডান পাশের বৃত্তের x
+        const y = 150; // y পজিশন
+        const r = 110; // বৃত্তের সাইজ
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI*2);
+        ctx.clip();
+        ctx.drawImage(img, x-r, y-r, r*2, r*2);
+        ctx.restore();
+      }
+      img.src = e.target.result;
+    }
+    reader.readAsDataURL(photoFile);
   }
+  bg.src = 'images/birthday-bg.jpg';
 }
 
-// 3. ডাউনলোড
-function downloadCard() {
+function downloadCard(){
   const link = document.createElement('a');
-  link.download = `MHF-Jonmodin-${name || 'Member'}.png`;
-  link.href = canvas.toDataURL('image/png', 1.0);
+  link.download = 'MHF-Birthday-Card.png';
+  link.href = canvas.toDataURL('image/png');
   link.click();
 }
 </script>
-
 </body>
 </html>
