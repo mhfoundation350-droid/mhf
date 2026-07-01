@@ -13,10 +13,10 @@
   #editor { position:relative; display:none; width:100%; touch-action:none; }
   #editor img.bg { width:100%; height:auto; display:block; border-radius:12px; }
   #editor canvas { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
- .draggable { position:absolute; touch-action:none; user-select:none; border:2px dashed #0d47a1; cursor:move; }
- .draggable img { width:100%; height:100%; object-fit:cover; border-radius:50%; pointer-events:none; }
- .draggable span { font-weight:700; color:#0d47a1; text-align:center; display:block; width:100%; pointer-events:none; white-space:nowrap; }
- .handle { width:20px; height:20px; background:#0d47a1; border-radius:50%; position:absolute; right:-10px; bottom:-10px; cursor:nwse-resize; }
+.draggable { position:absolute; touch-action:none; user-select:none; border:2px dashed #0d47a1; cursor:move; z-index:10; }
+.draggable img { width:100%; height:100%; object-fit:cover; border-radius:50%; pointer-events:none; }
+.draggable span { font-weight:700; color:#0d47a1; text-align:center; display:block; width:100%; pointer-events:none; white-space:nowrap; }
+.handle { width:20px; height:20px; background:#0d47a1; border-radius:50%; position:absolute; right:-10px; bottom:-10px; cursor:nwse-resize; z-index:11; }
 </style>
 </head>
 <body>
@@ -24,14 +24,14 @@
 <div class="container">
   <div class="form-box" id="formBox">
     <h2 style="text-align:center; margin-top:0;">কার্ড বানাও</h2>
-    <label>নাম:</label><input type="text" id="nameInput">
-    <label>পদবি:</label><input type="text" id="desigInput">
+    <label>নাম:</label><input type="text" id="nameInput" placeholder="যেমন: আলহাজ্ব মোঃ করিম">
+    <label>পদবি:</label><input type="text" id="desigInput" placeholder="যেমন: সভাপতি">
     <label>ছবি:</label><input type="file" id="photoInput" accept="image/*">
     <button class="btn" onclick="startEdit()">🎂 এডিট শুরু করো</button>
   </div>
 
   <div id="editor">
-    <img class="bg" id="bgImg" src="images/birthday-bg.jpg?t=1" crossorigin="anonymous">
+    <img class="bg" id="bgImg" src="./images/birthday-bg.jpg?t=1" crossorigin="anonymous">
     <canvas id="c"></canvas>
     <div class="draggable" id="photoBox" style="left:730px; top:270px; width:220px; height:220px;"><img id="userPhoto"></div>
     <div class="draggable" id="nameBox" style="left:730px; top:510px; width:220px; height:40px;"><span id="userName"></span></div>
@@ -49,7 +49,7 @@ function startEdit() {
   const name = document.getElementById('nameInput').value.trim();
   const desig = document.getElementById('desigInput').value.trim();
   const photoFile = document.getElementById('photoInput').files[0];
-  if(!name ||!desig ||!photoFile){ alert('3টাই লাগবে ভাই'); return; }
+  if(!name ||!desig ||!photoFile){ alert('নাম, পদবি, ছবি 3টাই লাগবে ভাই'); return; }
 
   document.getElementById('formBox').style.display = 'none';
   document.getElementById('editor').style.display = 'block';
@@ -91,9 +91,11 @@ function makeDraggable(el) {
     document.onmousemove = elementResize; document.ontouchmove = elementResize;
     document.onmouseup = stopResize; document.ontouchend = stopResize;
   }
-  function elementResize(e){ const newW = e.clientX||e.touches[0].clientX - el.getBoundingClientRect().left;
-    el.style.width = newW + 'px'; el.style.height = newW + 'px'; 
-    if(el.querySelector('span')) el.querySelector('span').style.fontSize = (newW/6) + 'px';
+  function elementResize(e){ const newW = (e.clientX||e.touches[0].clientX) - el.getBoundingClientRect().left;
+    if(newW > 40){
+      el.style.width = newW + 'px'; el.style.height = newW + 'px'; 
+      if(el.querySelector('span')) el.querySelector('span').style.fontSize = (newW/6) + 'px';
+    }
   }
   function stopResize(){ document.onmousemove=null; document.ontouchmove=null; }
 }
@@ -129,7 +131,7 @@ function downloadCard(){
     
     const link = document.createElement('a'); link.download = 'MHF-Card.png'; link.href = canvas.toDataURL('image/png'); link.click();
   }
-  bg.src = 'images/birthday-bg.jpg';
+  bg.src = './images/birthday-bg.jpg';
 }
 </script>
 </body>
