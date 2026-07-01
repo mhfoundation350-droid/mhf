@@ -2,38 +2,41 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>জন্মদিনের শুভেচ্ছা | MHF</title>
 <style>
-  body { margin:0; font-family: 'Noto Sans Bengali', sans-serif; background:#f0f2f5; display:flex; justify-content:center; padding:10px; }
+  body { margin:0; font-family: 'Noto Sans Bengali', sans-serif; background:#f0f2f5; display:flex; justify-content:center; padding:10px; touch-action:none; }
 .container { max-width: 1080px; width:100%; }
 .form-box { background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); margin-bottom:20px; }
-.form-box label { display:block; font-weight:700; margin-top:10px; margin-bottom:5px; }
-.form-box input { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; font-size:16px; }
+.form-box input { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; font-size:16px; margin-top:5px; }
 .btn { width:100%; padding:12px; background:#0d47a1; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:700; cursor:pointer; margin-top:15px; }
-  #card { position:relative; width:100%; }
-  #card img.bg { width:100%; height:auto; display:block; border-radius:12px; }
-  #card canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
+  #editor { position:relative; display:none; width:100%; touch-action:none; }
+  #editor img.bg { width:100%; height:auto; display:block; border-radius:12px; }
+  #editor canvas { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+ .draggable { position:absolute; touch-action:none; user-select:none; border:2px dashed #0d47a1; cursor:move; }
+ .draggable img { width:100%; height:100%; object-fit:cover; border-radius:50%; pointer-events:none; }
+ .draggable span { font-weight:700; color:#0d47a1; text-align:center; display:block; width:100%; pointer-events:none; white-space:nowrap; }
+ .handle { width:20px; height:20px; background:#0d47a1; border-radius:50%; position:absolute; right:-10px; bottom:-10px; cursor:nwse-resize; }
 </style>
 </head>
 <body>
 
 <div class="container">
   <div class="form-box" id="formBox">
-    <h2 style="text-align:center; margin-top:0;">জন্মদিনের কার্ড বানাও</h2>
-    <label>নাম:</label>
-    <input type="text" id="nameInput" placeholder="যেমন: আলহাজ্ব মোঃ করিম">
-    <label>পদবি:</label>
-    <input type="text" id="desigInput" placeholder="যেমন: সভাপতি">
-    <label>ছবি:</label>
-    <input type="file" id="photoInput" accept="image/*">
-    <button class="btn" onclick="makeCard()">🎂 কার্ড বানাও</button>
+    <h2 style="text-align:center; margin-top:0;">কার্ড বানাও</h2>
+    <label>নাম:</label><input type="text" id="nameInput">
+    <label>পদবি:</label><input type="text" id="desigInput">
+    <label>ছবি:</label><input type="file" id="photoInput" accept="image/*">
+    <button class="btn" onclick="startEdit()">🎂 এডিট শুরু করো</button>
   </div>
 
-  <div id="card" style="display:none;">
-    <img class="bg" id="bgImg" src="images/birthday-bg.jpg" crossorigin="anonymous">
+  <div id="editor">
+    <img class="bg" id="bgImg" src="images/birthday-bg.jpg?t=1" crossorigin="anonymous">
     <canvas id="c"></canvas>
-    <button class="btn" onclick="downloadCard()">📥 কার্ড ডাউনলোড করো</button>
+    <div class="draggable" id="photoBox" style="left:730px; top:270px; width:220px; height:220px;"><img id="userPhoto"></div>
+    <div class="draggable" id="nameBox" style="left:730px; top:510px; width:220px; height:40px;"><span id="userName"></span></div>
+    <div class="draggable" id="desigBox" style="left:730px; top:555px; width:220px; height:35px;"><span id="userDesig"></span></div>
+    <button class="btn" onclick="downloadCard()">📥 ফাইনাল ডাউনলোড</button>
   </div>
 </div>
 
@@ -42,68 +45,91 @@ const bg = document.getElementById('bgImg');
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 
-function makeCard() {
+function startEdit() {
   const name = document.getElementById('nameInput').value.trim();
   const desig = document.getElementById('desigInput').value.trim();
   const photoFile = document.getElementById('photoInput').files[0];
-
-  if(!name ||!desig ||!photoFile){
-    alert('নাম, পদবি, ছবি 3টাই দিতে হবে ভাই');
-    return;
-  }
+  if(!name ||!desig ||!photoFile){ alert('3টাই লাগবে ভাই'); return; }
 
   document.getElementById('formBox').style.display = 'none';
-  document.getElementById('card').style.display = 'block';
+  document.getElementById('editor').style.display = 'block';
+  document.getElementById('userName').innerText = name;
+  document.getElementById('userDesig').innerText = desig;
+  document.getElementById('userName').style.fontSize = '38px';
+  document.getElementById('userDesig').style.fontSize = '28px';
+  
+  const reader = new FileReader();
+  reader.onload = e => document.getElementById('userPhoto').src = e.target.result;
+  reader.readAsDataURL(photoFile);
 
-  bg.onload = () => {
-    const W = bg.naturalWidth; // 1080
-    const H = bg.naturalHeight; // 1080
-    canvas.width = W;
-    canvas.height = H;
-    ctx.drawImage(bg, 0, 0, W, H);
-    
-    ctx.textAlign = 'center'; 
-    
-    // স্কেল হিসাব - মোবাইলেও যাতে না সরে
-    const scaleX = W / 1080; 
-    const scaleY = H / 1080;
+  makeDraggable(document.getElementById('photoBox'));
+  makeDraggable(document.getElementById('nameBox'));
+  makeDraggable(document.getElementById('desigBox'));
+}
 
-    // 1. নাম - সাদা বৃত্তের নিচে মাঝখানে
-    ctx.font = `bold ${Math.round(38 * scaleX)}px Noto Sans Bengali`;
-    ctx.fillStyle = '#0d47a1';
-    ctx.fillText(name, Math.round(840 * scaleX), Math.round(610 * scaleY));
-
-    // 2. পদবি 
-    ctx.font = `${Math.round(28 * scaleX)}px Noto Sans Bengali`;
-    ctx.fillText(desig, Math.round(840 * scaleX), Math.round(655 * scaleY));
-
-    // 3. ছবি - সাদা বৃত্তের একদম মাঝে
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const x = Math.round(840 * scaleX); // X মাঝ
-        const y = Math.round(380 * scaleY); // Y মাঝ
-        const r = Math.round(110 * scaleX); // রেডিয়াস
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI*2);
-        ctx.clip();
-        ctx.drawImage(img, x-r, y-r, r*2, r*2);
-        ctx.restore();
-      }
-      img.src = e.target.result;
-    }
-    reader.readAsDataURL(photoFile);
+function makeDraggable(el) {
+  let pos1=0,pos2=0,pos3=0,pos4=0;
+  el.onmousedown = dragMouseDown;
+  el.ontouchstart = dragMouseDown;
+  function dragMouseDown(e){ e.preventDefault();
+    pos3 = e.clientX||e.touches[0].clientX; pos4 = e.clientY||e.touches[0].clientY;
+    document.onmouseup = closeDragElement; document.ontouchend = closeDragElement;
+    document.onmousemove = elementDrag; document.ontouchmove = elementDrag;
   }
-  bg.src = 'images/birthday-bg.jpg?t=' + Date.now(); // Cache clear
+  function elementDrag(e){ e.preventDefault();
+    pos1 = pos3 - (e.clientX||e.touches[0].clientX);
+    pos2 = pos4 - (e.clientY||e.touches[0].clientY);
+    pos3 = e.clientX||e.touches[0].clientX; pos4 = e.clientY||e.touches[0].clientY;
+    el.style.top = (el.offsetTop - pos2) + "px";
+    el.style.left = (el.offsetLeft - pos1) + "px";
+  }
+  function closeDragElement(){ document.onmouseup=null; document.onmousemove=null; document.ontouchend=null; document.ontouchmove=null; }
+  
+  const handle = document.createElement('div'); handle.className='handle'; el.appendChild(handle);
+  handle.onmousedown = resizeMouseDown; handle.ontouchstart = resizeMouseDown;
+  function resizeMouseDown(e){ e.stopPropagation(); e.preventDefault();
+    document.onmousemove = elementResize; document.ontouchmove = elementResize;
+    document.onmouseup = stopResize; document.ontouchend = stopResize;
+  }
+  function elementResize(e){ const newW = e.clientX||e.touches[0].clientX - el.getBoundingClientRect().left;
+    el.style.width = newW + 'px'; el.style.height = newW + 'px'; 
+    if(el.querySelector('span')) el.querySelector('span').style.fontSize = (newW/6) + 'px';
+  }
+  function stopResize(){ document.onmousemove=null; document.ontouchmove=null; }
 }
 
 function downloadCard(){
-  const link = document.createElement('a');
-  link.download = 'MHF-Birthday-Card.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
+  bg.onload = () => {
+    const W = bg.naturalWidth; const H = bg.naturalHeight;
+    canvas.width = W; canvas.height = H;
+    ctx.drawImage(bg, 0, 0, W, H);
+    
+    const editorRect = document.getElementById('editor').getBoundingClientRect();
+    const scaleX = W / editorRect.width; const scaleY = H / editorRect.height;
+
+    // ছবি
+    const pBox = document.getElementById('photoBox').getBoundingClientRect();
+    const img = document.getElementById('userPhoto');
+    const px = (pBox.left - editorRect.left + pBox.width/2) * scaleX;
+    const py = (pBox.top - editorRect.top + pBox.height/2) * scaleY;
+    const pr = (pBox.width/2) * scaleX;
+    ctx.save(); ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2); ctx.clip();
+    ctx.drawImage(img, px-pr, py-pr, pr*2, pr*2); ctx.restore();
+
+    // নাম
+    const nBox = document.getElementById('nameBox').getBoundingClientRect();
+    ctx.font = `bold ${parseInt(document.getElementById('userName').style.fontSize)*scaleX}px Noto Sans Bengali`;
+    ctx.fillStyle = '#0d47a1'; ctx.textAlign = 'center';
+    ctx.fillText(document.getElementById('userName').innerText, (nBox.left-editorRect.left+nBox.width/2)*scaleX, (nBox.top-editorRect.top+nBox.height*0.8)*scaleY);
+
+    // পদবি
+    const dBox = document.getElementById('desigBox').getBoundingClientRect();
+    ctx.font = `${parseInt(document.getElementById('userDesig').style.fontSize)*scaleX}px Noto Sans Bengali`;
+    ctx.fillText(document.getElementById('userDesig').innerText, (dBox.left-editorRect.left+dBox.width/2)*scaleX, (dBox.top-editorRect.top+dBox.height*0.8)*scaleY);
+    
+    const link = document.createElement('a'); link.download = 'MHF-Card.png'; link.href = canvas.toDataURL('image/png'); link.click();
+  }
+  bg.src = 'images/birthday-bg.jpg';
 }
 </script>
 </body>
