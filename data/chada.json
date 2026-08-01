@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>মাসিক চাঁদার হিসাব - MHF</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+  <h2>মাসিক চাঁদার হিসাব 2026</h2>
+  
+  <select id="monthSelect">
+    <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option>
+    <option>এপ্রিল</option><option>মে</option><option>জুন</option>
+    <option>জুলাই</option><option>আগস্ট</option><option>সেপ্টেম্বর</option>
+    <option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
+  </select>
+  
+  <input type="text" id="searchBox" placeholder="নাম বা পদবী দিয়ে সার্চ করুন">
+  
+  <table id="chadaTable">
+    <thead><tr><th>ID</th><th>নাম</th><th>পদবী</th><th>চাঁদা</th><th>স্ট্যাটাস</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <h3 id="total">মোট: 0 টাকা</h3>
+
+<script>
+fetch('data/chada.json')
+.then(res => res.json())
+.then(data => {
+  const monthSelect = document.getElementById('monthSelect');
+  const searchBox = document.getElementById('searchBox');
+  function render() {
+    const month = monthSelect.value;
+    const search = searchBox.value.toLowerCase();
+    let total = 0;
+    let html = '';
+    data.filter(i => i.name.includes(search) || i.podobi.includes(search))
+   .forEach(i => {
+      const amount = i.chada[month] || 0;
+      total += amount;
+      const status = amount > 0? '✅ দেওয়া হয়েছে' : '❌ বাকি';
+      html += `<tr><td>${i.id}</td><td>${i.name}</td><td>${i.podobi}</td><td>${amount} টাকা</td><td>${status}</td></tr>`;
+    });
+    document.querySelector('#chadaTable tbody').innerHTML = html;
+    document.getElementById('total').innerText = `মোট: ${total} টাকা`;
+  }
+  monthSelect.onchange = render;
+  searchBox.onkeyup = render;
+  render();
+});
+</script>
+</body>
+</html>
