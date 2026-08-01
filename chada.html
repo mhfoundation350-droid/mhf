@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<title>মাসিক চাঁদা হিসাব - মেঘনা ইউনিয়ানিটি ফাউন্ডেশন</title>
+<style>
+    body { font-family: 'SolaimanLipi'; background: #f0fff0; padding: 20px; }
+.container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    h1 { text-align: center; color: #007b00; }
+.top-bar { display: flex; justify-content: space-between; align-items: center; }
+.admin-btn,.add-btn { background: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-left:5px; }
+.add-btn { background: #28a745; }
+.del-btn { background: red; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; }
+    select, input { padding: 8px; margin: 10px 5px; border-radius: 5px; width: 90%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { background: #28a745; color: white; padding: 10px; }
+    td { padding: 10px; text-align: center; border: 1px solid #ddd; }
+.paid { background: #d4edda; color: #155724; font-weight: bold; }
+.unpaid { background: #f8d7da; color: #721c24; font-weight: bold; }
+.clickable:hover { cursor: pointer; opacity: 0.8; }
+.summary { display: flex; justify-content: space-around; margin-top: 15px; font-size: 18px; font-weight: bold; }
+.paid-count { color: green; }
+.unpaid-count { color: red; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+.modal-content { background: white; margin: 10% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 10px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="top-bar">
+        <h1>মেঘনা ইউনিয়ানিটি ফাউন্ডেশন</h1>
+        <div>
+            <button class="add-btn" onclick="showAddMember()" id="addBtn" style="display:none;">+ সদস্য এড</button>
+            <button class="admin-btn" onclick="adminLogin()" id="loginBtn">এডমিন লগিন</button>
+            <button class="admin-btn" onclick="adminLogout()" id="logoutBtn" style="display:none;">লগআউট</button>
+        </div>
+    </div>
+    <h2 style="text-align:center;">মাসিক চাঁদার হিসাব 2026</h2>
+
+    <select id="monthSelect"></select>
+    <input type="text" id="searchInput" placeholder="নাম বা পদবী দিয়ে সার্চ করুন">
+
+    <table id="chadaTable">
+        <thead><tr><th>ID</th><th>নাম</th><th>পদবী</th><th>নির্ধারিত চাঁদা</th><th>স্ট্যাটাস</th><th id="actionHead" style="display:none;">একশন</th></tr></thead>
+        <tbody></tbody>
+    </table>
+    <div class="summary">
+        <span class="paid-count" id="paidCount"></span>
+        <span class="unpaid-count" id="unpaidCount"></span>
+        <span id="totalAmount"></span>
+    </div>
+</div>
+
+<!-- লগিন মোডাল -->
+<div id="loginModal" class="modal"><div class="modal-content">
+    <h3>এডমিন লগিন</h3>
+    <input type="password" id="passInput" placeholder="পাসওয়ার্ড দিন">
+    <br><br><button onclick="checkPass()">লগিন</button> <button onclick="closeModal('loginModal')">বাতিল</button>
+</div></div>
+
+<!-- সদস্য এড মোডাল - নতুন ভার্সন -->
+<div id="addModal" class="modal"><div class="modal-content">
+    <h3>নতুন সদস্য এড করুন</h3>
+    <input type="text" id="newName" placeholder="নাম লিখুন"><br><br>
+    <input type="text" id="newPodobi" placeholder="পদবী লিখুন - যেমন: সদস্য, সভাপতি"><br><br>
+    <input type="number" id="newAmount" placeholder="চাঁদার পরিমান লিখুন - যেমন: 500"><br><br>
+    <button onclick="addMember()">সেভ করুন</button> <button onclick="closeModal('addModal')">বাতিল</button>
+</div></div>
+
+<!-- কনফার্ম মোডাল -->
+<div id="confirmModal" class="modal"><div class="modal-content">
+    <h3 id="confirmText"></h3>
+    <br><button onclick="confirmAction()" style="background:green;color:white;padding:8px 15px;border:none;border-radius:5px;">হ্যাঁ, কনফার্ম</button>
+    <button onclick="closeModal('confirmModal')" style="background:red;color:white;padding:8px 15px;border:none;border-radius:5px;">না</button>
+</div></div>
+
+<script>
+const months = ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+const ADMIN_PASS = "mhf2026";
+let isAdmin = false;
+let tempAction = null;
+
+let members = JSON.parse(localStorage.getItem('mhf_members')) || [
+  {"id": 1, "name": "মোহাম্মদ রাব্বুল", "podobi": "উপদেষ্টা", "amount": 1000},
+  {"id": 2, "name": "আব্দুল কাদের", "podobi": "সভাপতি", "amount": 800},
+  {"id": 3, "name": "সাইফুল ইসলাম", "podobi": "সাধারণ সম্পাদক", "amount": 800},
+  {"id": 4, "name": "রাকিব হোসেন", "podobi": "সদস্য", "amount": 500}
+];
+let payments = JSON.parse(localStorage.getItem('mhf_payments')) || {};
+
+const monthSelect = document.getElementById('monthSelect');
+months.forEach(m => monthSelect.innerHTML += `<option>${m}</option>`);
+monthSelect.value = "আগস্ট";
+
+function saveData(){
+    localStorage.setItem('mhf_members', JSON.stringify(members));
+    localStorage.setItem('mhf_payments', JSON.stringify(payments));
+}
+
+function loadTable(){
+    const month = monthSelect.value;
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const tbody = document.querySelector('#chadaTable tbody');
+    tbody.innerHTML = '';
+    let total = 0, paid = 0, unpaid = 0;
+
+    members.filter(x => x.name.toLowerCase().includes(search) || x.podobi.toLowerCase().includes(search))
+.forEach(x => {
+        const fixedAmount = x.amount || 500;
+        const isPaid = payments[month] && payments[month][x.id];
+        const amount = isPaid? fixedAmount : 0;
+        total += amount;
+        if(isPaid) paid++; else unpaid++;
+
+        const statusClass = isPaid? 'paid' : 'unpaid';
+        const statusText = isPaid? `✓ ${fixedAmount} টাকা` : `✗ বকেয়া`;
+        const clickClass = isAdmin? 'clickable' : '';
+        const delBtn = isAdmin? `<button class="del-btn" onclick="event.stopPropagation(); askDelete(${x.id})">মুছুন</button>` : '';
+
+        tbody.innerHTML += `<tr class="${clickClass}" onclick="askPayment(${x.id}, '${x.name}')">
+            <td>${x.id}</td><td>${x.name}</td><td>${x.podobi}</td>
+            <td>${fixedAmount} টাকা</td>
+            <td class="${statusClass}">${statusText}</td>
+            <td>${delBtn}</td>
+        </tr>`;
+    });
+    document.getElementById('paidCount').innerText = `দিয়েছেন: ${paid} জন`;
+    document.getElementById('unpaidCount').innerText = `বাকি: ${unpaid} জন`;
+    document.getElementById('totalAmount').innerText = `মোট: ${total} টাকা`;
+}
+
+function askPayment(id, name){
+    if(!isAdmin) return alert("এডমিন লগিন করুন");
+    const month = monthSelect.value;
+    const isPaid = payments[month] && payments[month][id];
+    const action = isPaid? "বকেয়া" : "আদায়";
+    document.getElementById('confirmText').innerText = `${name} এর চাঁদা ${action} মার্ক করবেন?`;
+    tempAction = () => doPayment(id);
+    document.getElementById('confirmModal').style.display = 'block';
+}
+
+function doPayment(id){
+    const month = monthSelect.value;
+    if(!payments[month]) payments[month] = {};
+    payments[month][id] =!payments[month][id];
+    saveData(); loadTable();
+}
+
+function askDelete(id){
+    const member = members.find(m => m.id == id);
+    document.getElementById('confirmText').innerText = `${member.name} কে মুছে ফেলবেন?`;
+    tempAction = () => deleteMember(id);
+    document.getElementById('confirmModal').style.display = 'block';
+}
+
+function deleteMember(id){
+    members = members.filter(m => m.id!= id);
+    saveData(); loadTable();
+}
+
+function confirmAction(){
+    if(tempAction) tempAction();
+    closeModal('confirmModal');
+}
+
+function showAddMember(){ document.getElementById('addModal').style.display = 'block'; }
+function addMember(){
+    const name = document.getElementById('newName').value;
+    const podobi = document.getElementById('newPodobi').value;
+    const amount = parseInt(document.getElementById('newAmount').value);
+    if(name == "" || podobi == "" ||!amount) return alert("সব ঘর পূরন করুন");
+    const newId = members.length > 0? Math.max(...members.map(m => m.id)) + 1 : 1;
+    members.push({id: newId, name: name, podobi: podobi, amount: amount});
+    saveData(); loadTable(); closeModal('addModal');
+    document.getElementById('newName').value = "";
+    document.getElementById('newPodobi').value = "";
+    document.getElementById('newAmount').value = "";
+}
+
+function adminLogin(){ document.getElementById('loginModal').style.display = 'block'; }
+function closeModal(id){ document.getElementById(id).style.display = 'none'; }
+function checkPass(){
+    if(document.getElementById('passInput').value === ADMIN_PASS){
+        isAdmin = true;
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        document.getElementById('addBtn').style.display = 'inline-block';
+        document.getElementById('actionHead').style.display = 'table-cell';
+        alert("এডমিন লগিন সফল!");
+        closeModal('loginModal'); loadTable();
+    } else { alert("ভুল পাসওয়ার্ড"); }
+}
+function adminLogout(){
+    isAdmin = false;
+    document.getElementById('loginBtn').style.display = 'inline-block';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('addBtn').style.display = 'none';
+    document.getElementById('actionHead').style.display = 'none';
+    loadTable();
+}
+
+monthSelect.onchange = loadTable;
+document.getElementById('searchInput').onkeyup = loadTable;
+loadTable();
+</script>
+</body>
+</html>
