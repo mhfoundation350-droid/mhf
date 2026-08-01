@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<title>মাসিক চাঁদা হিসাব - মেঘনা ইউনিয়ানিটি ফাউন্ডেশন</title>
+<style>
+    body { font-family: 'SolaimanLipi'; background: #f0fff0; padding: 20px; }
+  .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    h1 { text-align: center; color: #007b00; }
+   .top-bar { display: flex; justify-content: space-between; align-items: center; }
+  .admin-btn { background: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; }
+    select, input { padding: 8px; margin: 10px 5px; border-radius: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { background: #28a745; color: white; padding: 10px; }
+    td { padding: 10px; text-align: center; border: 1px solid #ddd; }
+  .paid { background: #d4edda; color: #155724; font-weight: bold; }
+  .unpaid { background: #f8d7da; color: #721c24; font-weight: bold; }
+  .clickable:hover { cursor: pointer; opacity: 0.8; }
+  .summary { display: flex; justify-content: space-around; margin-top: 15px; font-size: 18px; font-weight: bold; }
+  .paid-count { color: green; }
+  .unpaid-count { color: red; }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+  .modal-content { background: white; margin: 15% auto; padding: 20px; width: 300px; border-radius: 10px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="top-bar">
+        <h1>মেঘনা ইউনিয়ানিটি ফাউন্ডেশন</h1>
+        <button class="admin-btn" onclick="adminLogin()">এডমিন লগিন</button>
+    </div>
+    <h2 style="text-align:center;">মাসিক চাঁদার হিসাব 2026</h2>
+
+    <select id="monthSelect"></select>
+    <input type="text" id="searchInput" placeholder="নাম বা পদবী দিয়ে সার্চ করুন">
+
+    <table id="chadaTable">
+        <thead><tr><th>ID</th><th>নাম</th><th>পদবী</th><th>নির্ধারিত চাঁদা</th><th>স্ট্যাটাস</th></tr></thead>
+        <tbody></tbody>
+    </table>
+    <div class="summary">
+        <span class="paid-count" id="paidCount"></span>
+        <span class="unpaid-count" id="unpaidCount"></span>
+        <span id="totalAmount"></span>
+    </div>
+</div>
+
+<!-- পাসওয়ার্ড বক্স -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <h3>এডমিন লগিন</h3>
+    <input type="password" id="passInput" placeholder="পাসওয়ার্ড দিন">
+    <br><br>
+    <button onclick="checkPass()">লগিন</button>
+    <button onclick="closeModal()">বাতিল</button>
+  </div>
+</div>
+
+<script>
+const months = ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+const chadaRate = { "উপদেষ্টা": 1000, "সভাপতি": 800, "সাধারণ সম্পাদক": 800, "সদস্য": 500 };
+const ADMIN_PASS = "mhf2026"; // পাসওয়ার্ড এখানে চেঞ্জ করবেন
+let isAdmin = false;
+
+const monthSelect = document.getElementById('monthSelect');
+months.forEach(m => monthSelect.innerHTML += `<option>${m}</option>`);
+monthSelect.value = "আগস্ট";
+
+let members = [
+  {"id": 1, "name": "মোহাম্মদ রাব্বুল", "podobi": "উপদেষ্টা"},
+  {"id": 2, "name": "আব্দুল কাদের", "podobi": "সভাপতি"},
+  {"id": 3, "name": "সাইফুল ইসলাম", "podobi": "সাধারণ সম্পাদক"},
+  {"id": 4, "name": "রাকিব হোসেন", "podobi": "সদস্য"},{"id": 5, "name": "নাজমুল হক", "podobi": "সদস্য"},
+  {"id": 6, "name": "কামাল উদ্দিন", "podobi": "সদস্য"},{"id": 7, "name": "জামাল হোসেন", "podobi": "সদস্য"},
+  {"id": 8, "name": "রাসেল আহমেদ", "podobi": "সদস্য"},{"id": 9, "name": "ইমরান খান", "podobi": "সদস্য"},
+  {"id": 10, "name": "শরীফ মিয়া", "podobi": "সদস্য"},{"id": 11, "name": "হাসান আলী", "podobi": "সদস্য"},
+  {"id": 12, "name": "মাহফুজ রহমান", "podobi": "সদস্য"},{"id": 13, "name": "আরিফুল ইসলাম", "podobi": "সদস্য"},
+  {"id": 14, "name": "সোহেল রানা", "podobi": "সদস্য"},{"id": 15, "name": "তানভীর আহমেদ", "podobi": "সদস্য"}
+];
+
+// লোকাল স্টোরেজ থেকে ডাটা লোড
+let payments = JSON.parse(localStorage.getItem('mhf_payments')) || {};
+
+function loadTable(){
+    const month = monthSelect.value;
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const tbody = document.querySelector('#chadaTable tbody');
+    tbody.innerHTML = '';
+    let total = 0, paid = 0, unpaid = 0;
+
+    members.filter(x => x.name.toLowerCase().includes(search) || x.podobi.toLowerCase().includes(search))
+  .forEach(x => {
+        const fixedAmount = chadaRate[x.podobi] || 500;
+        const isPaid = payments[month] && payments[month][x.id];
+        const amount = isPaid? fixedAmount : 0;
+        total += amount;
+        if(isPaid) paid++; else unpaid++;
+
+        const statusClass = isPaid? 'paid' : 'unpaid';
+        const statusText = isPaid? `✓ ${fixedAmount} টাকা` : `✗ বকেয়া`;
+        const clickClass = isAdmin? 'clickable' : '';
+
+        tbody.innerHTML += `<tr class="${clickClass}" onclick="togglePayment(${x.id})">
+            <td>${x.id}</td><td>${x.name}</td><td>${x.podobi}</td>
+            <td>${fixedAmount} টাকা</td>
+            <td class="${statusClass}">${statusText}</td>
+        </tr>`;
+    });
+    document.getElementById('paidCount').innerText = `দিয়েছেন: ${paid} জন`;
+    document.getElementById('unpaidCount').innerText = `বাকি: ${unpaid} জন`;
+    document.getElementById('totalAmount').innerText = `মোট: ${total} টাকা`;
+}
+
+function togglePayment(id){
+    if(!isAdmin) return alert("এডমিন লগিন করুন");
+    const month = monthSelect.value;
+    if(!payments[month]) payments[month] = {};
+    payments[month][id] =!payments[month][id];
+    localStorage.setItem('mhf_payments', JSON.stringify(payments)); // সেভ হয়ে যাবে
+    loadTable();
+}
+
+function adminLogin(){ document.getElementById('loginModal').style.display = 'block'; }
+function closeModal(){ document.getElementById('loginModal').style.display = 'none'; }
+function checkPass(){
+    if(document.getElementById('passInput').value === ADMIN_PASS){
+        isAdmin = true;
+        alert("এডমিন লগিন সফল! এখন লাইনে ক্লিক করে টাকা আদায় মার্ক করুন");
+        closeModal();
+        loadTable();
+    } else { alert("ভুল পাসওয়ার্ড"); }
+}
+
+monthSelect.onchange = loadTable;
+document.getElementById('searchInput').onkeyup = loadTable;
+loadTable();
+</script>
+</body>
+</html>
