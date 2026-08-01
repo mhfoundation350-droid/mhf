@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>মাসিক চাঁদার হিসাব - MHF</title>
+  <style>
+    body { font-family: sans-serif; background: #f0fdf4; padding: 15px; margin: 0; }
+    h1 { color: #15803d; text-align: center; margin-bottom: 5px; font-size: 24px; }
+    h2 { color: #2563eb; text-align: center; margin-top: 0; font-size: 18px; }
+  .controls { text-align: center; margin: 15px 0; }
+    select, input { padding: 10px; margin: 5px; border: 2px solid #16a34a; border-radius: 8px; font-size: 16px; width: 90%; max-width: 300px; }
+    table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+    th { background: linear-gradient(90deg, #16a34a, #2563eb); color: white; padding: 10px; font-size: 14px; }
+    td { padding: 8px; border-bottom: 1px solid #ddd; text-align: center; font-size: 14px; }
+  .paid { color: #16a34a; font-weight: bold; }
+  .due { color: #dc2626; font-weight: bold; }
+    #total { text-align: center; margin-top: 20px; font-size: 20px; color: #d97706; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>মেঘনা হিউম্যানিটি ফাউন্ডেশন</h1>
+  <h2>মাসিক চাঁদার হিসাব 2026</h2>
+  
+  <div class="controls">
+    <select id="monthSelect">
+      <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option>
+      <option>এপ্রিল</option><option>মে</option><option>জুন</option>
+      <option>জুলাই</option><option>আগস্ট</option><option>সেপ্টেম্বর</option>
+      <option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
+    </select>
+    <input type="text" id="searchBox" placeholder="নাম বা পদবী দিয়ে সার্চ করুন">
+  </div>
+  
+  <table id="chadaTable">
+    <thead>
+      <tr><th>ID</th><th>নাম</th><th>পদবী</th><th>চাঁদা</th><th>স্ট্যাটাস</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <h3 id="total">মোট: 0 টাকা</h3>
+
+<script>
+fetch('data/chada.json')
+.then(res => res.json())
+.then(data => {
+  const monthSelect = document.getElementById('monthSelect');
+  const searchBox = document.getElementById('searchBox');
+  function render() {
+    const month = monthSelect.value;
+    const search = searchBox.value.toLowerCase();
+    let total = 0;
+    let html = '';
+    data.filter(i => i.name.toLowerCase().includes(search) || i.podobi.toLowerCase().includes(search))
+ .forEach(i => {
+      const amount = i.chada[month] || 0;
+      total += amount;
+      const status = amount > 0? `<span class="paid">✅ ${amount} টাকা</span>` : `<span class="due">❌ বাকি</span>`;
+      html += `<tr><td>${i.id}</td><td>${i.name}</td><td>${i.podobi}</td><td>${amount} টাকা</td><td>${status}</td></tr>`;
+    });
+    document.querySelector('#chadaTable tbody').innerHTML = html;
+    document.getElementById('total').innerText = `মোট: ${total} টাকা`;
+  }
+  monthSelect.onchange = render;
+  searchBox.onkeyup = render;
+  render();
+})
+.catch(err => {
+  document.querySelector('#chadaTable tbody').innerHTML = '<tr><td colspan="5">data/chada.json ফাইল পাওয়া যায়নি</td></tr>';
+});
+</script>
+</body>
+</html>
